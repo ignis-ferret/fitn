@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reward Selector</title>
+<style>
+  :root { --bg:#fafafa; --card:#fff; --text:#111; --muted:#666; --line:#eee; }
+  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); }
+  .wrap { padding:12px; max-width:820px; margin:0 auto; }
+  .panel { background:var(--card); border-radius:12px; padding:14px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+  .title { font-weight:700; font-size:18px; margin-bottom:6px; }
+  .muted { color:var(--muted); font-size:13px; }
+  .row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line); gap:8px; }
+  .row:last-child { border-bottom:0; }
+  .cap { font-size:12px; color:#888; margin-top:2px; }
+  .pill { font-size:12px; padding:3px 10px; border-radius:999px; background:#f0f0f0; margin-left:6px; }
+  .group { border:1px solid var(--line); border-radius:10px; padding:10px; margin-top:10px; }
+  .hdr { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:6px; }
+  .btnbar { display:flex; gap:8px; position:sticky; bottom:0; background:var(--bg); padding-top:8px; }
+  .btn { flex:1; padding:12px; border:none; border-radius:10px; font-weight:700; }
+  .btn.primary { background:#111; color:#fff; }
+  .btn.ghost { background:#e9e9e9; color:#111; }
+  input[type="checkbox"] { transform:scale(1.2); }
+  .radio { transform:scale(1.2); margin-right:6px; }
+  .warn { color:#b94a48; font-size:12px; margin-top:6px; }
+  .ok { color:#1a7f37; font-size:12px; margin-top:6px; }
+  .hidden { visibility:hidden; }
+</style>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <div class="title" id="stepTitle">Reward Selector</div>
+    <div class="muted" id="stepHint">Step 1 of 4 — Choose up to <b>3</b> Level 1 groups.</div>
+  </div>
+
+  <div id="stage"></div>
+
+  <div class="panel">
+    <input id="userId" placeholder="User ID" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;margin-bottom:8px;">
+    <div class="btnbar">
+      <button class="btn ghost" id="backBtn">Back</button>
+      <button class="btn primary" id="nextBtn">Next</button>
+    </div>
+    <div id="msg" class="cap"></div>
+  </div>
+</div>
+
+<script>
+let data=null;
+
+/* ===== Wizard Steps =====
+  1: Level 1 list (multi, up to 3)
+  2: Level 2 per selected L1 — one L1 at a time, showing ALL its L2 with checkboxes (up to 3 for that L1). Iterate L1→L1. Require at least one L2 overall.
+  3: Level 3 per selected L2 — one L2 at a time, showing ALL its L3 items with checkboxes (EXACTLY 2 for that L2). Iterate L2→L2.
+  4: Variants per selected L3 item — one item at a time, radio (EXACTLY 1). Iterate item→item, then save.
+*/
+let step = 1;
+
+// Limits
+const L1_LIMIT = 3;
+const L2_PER_L1_LIMIT = 3;
+const L3_PER_L2_REQUIRE = 2;
+
+// Selections (ordered)
+let selL1 = new Set();               // Set<l1Code>
+let l1Order = [];                    // Array<l1Code> (preserves UI order at lock)
+const selL2ByL1 = new Map();         // Map<l1Code, Set<l2Code>>
+let l1Idx = 0;                       // index across l1Order during Step 2
+
+let l2Order = [];                    // Array<l2Code> (built after Step 2, preserving category order)
+let l2Idx = 0;                       // index across l2Order during Step 3
+const selL3ByL2 = new Map();         // Map<l2Code, Set<itemCode>>
+
+let l3ItemsOrder = [];               // Array<itemCode> (flatten of chosen items across all selected L2)
+let varIdx = 0;                      // index across l3ItemsOrder during Step 4
+const varByItem = new Map();         // Map<itemCode, variantCode>
+
+// UI helpers
+function setHint(html){ document.getElementById('stepHint').innerHTML = html; }
+function setTitle(txt){ document.getElementById('stepTitle').textContent = txt; }
+function say(msg){ document.getElementById('msg').textContent = msg || ''; }
+function setVisible(el, vis){ el.style.visibility = vis ? 'visible' : 'hidden'; }
+function setBtnText(id, txt){ document.getElementById(id).textContent = txt; }
+function setOf(map, key){ if(!map.has(key)) map.set(key,new Set()); return map.get(key); }
+
+// Lookups
+function getGroup(l1){ return data.groups.find(g=>g.code===l1); }
+function getCategory(l2){
+  for(const g of data.groups){ for(const c of g.categories){ if(c.code===l2) return {g,c}; } }
+  return null;
+}
+function getItem(itemCode){
+  for(const g of data.groups){ for(const c of g.categories){ for(const it of c.items){ if(it.code===itemCode) return {g,c,it}; } } }
+  return null;
+}
+
+// Build orders
+function lockL1Order(){
+  l1Order = data.groups.filter(g=>selL1.has(g.code)).map(g=>g.code);
+  l1Idx = 0;
+}
+function buildL2Order(){
+  // Flatten chosen L2 by walking l1Order and each group's category order
+  const order = [];
+  l1Order.forEach(l1=>{
+    const g = getGroup(l1); if(!g) return;
+    const chosen = selL2ByL1.get(l1) || new Set();
+    g.categories.forEach(c=>{ if(chosen.has(c.code)) order.push(c.code); });
+  });
+  l2Order = order; l2Idx = 0;
+}
+function buildL3ItemsOrder(){
+  const items = [];
+  l2Order.forEach(l2=>{
+    const chosen = selL3ByL2.get(l2) || new Set();
+    const ctx = getCategory(l2); if(!ctx) return;
+    ctx.c.items.forEach(it=>{ if(chosen.has(it.code)) items.push(it.code); });
+  });
+  l3ItemsOrder = items; varIdx = 0;
+}
+
+// Constraints
+function canNext(){
+  if(step===1){
+    return selL1.size>0 && selL1.size<=L1_LIMIT;
+  }
+  if(step===2){
+    // At least one L2 across all selected L1s
+    let total=0;
+    l1Order.forEach(l1=> total += (selL2ByL1.get(l1)||new Set()).size );
+    return total>0;
+  }
+  if(step===3){
+    // exactly 2 for the current L2
+    const curL2 = l2Order[l2Idx];
+    const count = (selL3ByL2.get(curL2)||new Set()).size;
+    return count===L3_PER_L2_REQUIRE;
+  }
+  if(step===4){
+    // exactly 1 variant for current item
+    const curItem = l3ItemsOrder[varIdx];
+    return !!varByItem.get(curItem);
+  }
+  return true;
+}
+
+// Prune downstream when going back/changing
+function pruneAfterL1Change(){
+  // Remove L2, L3, variants for any L1 not in selL1
+  for(const [l1,set] of selL2ByL1.entries()){
+    if(!selL1.has(l1)){
+      // delete downstream for this l1
+      const g = getGroup(l1); if(g){
+        g.categories.forEach(c=>{
+          selL3ByL2.delete(c.code);
+          c.items.forEach(it=>varByItem.delete(it.code));
+        });
+      }
+      selL2ByL1.delete(l1);
+    }
+  }
+}
+function pruneAfterL2Change(l1){
+  // For removed L2 under this l1, drop their L3 + variants
+  const g = getGroup(l1); if(!g) return;
+  const chosen = selL2ByL1.get(l1) || new Set();
+  g.categories.forEach(c=>{
+    if(!chosen.has(c.code)){
+      selL3ByL2.delete(c.code);
+      c.items.forEach(it=>varByItem.delete(it.code));
+    }
+  });
+}
+
+// Render steps
+function render(){
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
+  say('');
+  setVisible(document.getElementById('backBtn'), step!==1);
+  setBtnText('nextBtn', step===4 ? 'Save' : 'Next');
+
+  if(!data){ stage.innerHTML = '<div class="panel">Loading…</div>'; return; }
+
+  // STEP 1 — Level 1 list (multi)
+  if(step===1){
+    setTitle('Level 1');
+    setHint(`Step 1 of 4 — Choose up to <b>${L1_LIMIT}</b> Level 1 groups.`);
+    const box = document.createElement('div'); box.className='panel';
+
+    data.groups.forEach(g=>{
+      const row = document.createElement('div'); row.className='row';
+      const left = document.createElement('div');
+      left.innerHTML = `<div><b>${g.title}</b></div><div class="cap">${g.code}</div>`;
+      row.appendChild(left);
+
+      const chk = document.createElement('input'); chk.type='checkbox'; chk.checked = selL1.has(g.code);
+      if(!chk.checked && selL1.size>=L1_LIMIT) chk.disabled = true;
+      chk.onchange = ()=>{
+        if(chk.checked){
+          if(selL1.size>=L1_LIMIT){ chk.checked=false; return; }
+          selL1.add(g.code); setOf(selL2ByL1, g.code);
+        }else{
+          selL1.delete(g.code);
+          // prune downstream of this group
+          const chosen = selL2ByL1.get(g.code) || new Set();
+          g.categories.forEach(c=>{
+            if(chosen.has(c.code) || true){
+              selL3ByL2.delete(c.code);
+              c.items.forEach(it=>varByItem.delete(it.code));
+            }
+          });
+          selL2ByL1.delete(g.code);
+        }
+        render();
+      };
+      row.appendChild(chk);
+      box.appendChild(row);
+    });
+
+    stage.appendChild(box);
+    return;
+  }
+
+  // STEP 2 — Level 2 for current L1 (all L2 on one screen; up to 3)
+  if(step===2){
+    const l1 = l1Order[l1Idx];
+    const g = getGroup(l1);
+    setTitle('Level 2');
+    setHint(`Step 2 of 4 — ${g.title} <span class="pill">${(selL2ByL1.get(l1)||new Set()).size}/${L2_PER_L1_LIMIT}</span> • Select up to ${L2_PER_L1_LIMIT} for this group.`);
+
+    const box = document.createElement('div'); box.className='panel';
+    const grp = document.createElement('div'); grp.className='group';
+    const hdr = document.createElement('div'); hdr.className='hdr';
+    hdr.innerHTML = `<div class="title">${g.title}</div><div class="cap">${g.code} • ${l1Idx+1}/${l1Order.length}</div>`;
+    grp.appendChild(hdr);
+
+    const bucket = setOf(selL2ByL1, l1);
+
+    g.categories.forEach(c=>{
+      const row = document.createElement('div'); row.className='row';
+      const left = document.createElement('div'); left.innerHTML = `<div><b>${c.title}</b></div><div class="cap">${c.code}</div>`;
+      row.appendChild(left);
+
+      const chk = document.createElement('input'); chk.type='checkbox'; chk.checked = bucket.has(c.code);
+      if(!chk.checked && bucket.size>=L2_PER_L1_LIMIT) chk.disabled = true;
+
+      chk.onchange = ()=>{
+        if(chk.checked){
+          if(bucket.size>=L2_PER_L1_LIMIT){ chk.checked=false; return; }
+          bucket.add(c.code);
+          setOf(selL3ByL2, c.code); // init downstream bucket
+        }else{
+          bucket.delete(c.code);
+          selL3ByL2.delete(c.code);
+          c.items.forEach(it=>varByItem.delete(it.code));
+        }
+        render();
+      };
+
+      row.appendChild(chk); grp.appendChild(row);
+    });
+
+    // Hint if none selected at all across L1s
+    let total=0; l1Order.forEach(code=> total += (selL2ByL1.get(code)||new Set()).size );
+    const note = document.createElement('div'); note.className = total>0 ? 'ok' : 'warn';
+    note.textContent = total>0 ? 'You have selected some Level 2 options.' : 'Select at least one Level 2 across all groups to continue.';
+    grp.appendChild(note);
+
+    box.appendChild(grp);
+    stage.appendChild(box);
+    return;
+  }
+
+  // STEP 3 — Level 3 for current L2 (exactly 2)
+  if(step===3){
+    const curL2 = l2Order[l2Idx];
+    const ctx = getCategory(curL2);
+    setTitle('Level 3');
+    setHint(`Step 3 of 4 — ${ctx.g.title} › ${ctx.c.title} • Select exactly <b>${L3_PER_L2_REQUIRE}</b> items.`);
+
+    const box = document.createElement('div'); box.className='panel';
+    const grp = document.createElement('div'); grp.className='group';
+    const hdr = document.createElement('div'); hdr.className='hdr';
+    hdr.innerHTML = `<div class="title">${ctx.g.title} › ${ctx.c.title}</div><div class="cap">${l2Idx+1}/${l2Order.length} • ${curL2}</div>`;
+    grp.appendChild(hdr);
+
+    const bucket = setOf(selL3ByL2, curL2);
+
+    ctx.c.items.forEach(it=>{
+      const row = document.createElement('div'); row.className='row';
+      const left = document.createElement('div'); left.innerHTML = `<div><b>${it.title}</b></div><div class="cap">${it.code}</div>`;
+      row.appendChild(left);
+
+      const chk = document.createElement('input'); chk.type='checkbox'; chk.checked = bucket.has(it.code);
+      if(!chk.checked && bucket.size>=L3_PER_L2_REQUIRE) chk.disabled = true;
+
+      chk.onchange = ()=>{
+        if(chk.checked){
+          if(bucket.size>=L3_PER_L2_REQUIRE){ chk.checked=false; return; }
+          bucket.add(it.code);
+          varByItem.delete(it.code); // will choose variant in step 4
+        }else{
+          bucket.delete(it.code);
+          varByItem.delete(it.code);
+        }
+        render();
+      };
+
+      row.appendChild(chk); grp.appendChild(row);
+    });
+
+    const cnt = bucket.size;
+    const helper = document.createElement('div'); helper.className = (cnt===L3_PER_L2_REQUIRE) ? 'ok':'warn';
+    helper.textContent = (cnt===L3_PER_L2_REQUIRE)
+      ? `Looks good: ${cnt}/${L3_PER_L2_REQUIRE} selected.`
+      : `Select exactly ${L3_PER_L2_REQUIRE} (currently ${cnt}).`;
+    grp.appendChild(helper);
+
+    box.appendChild(grp);
+    stage.appendChild(box);
+    return;
+  }
+
+  // STEP 4 — Variants for current item (exactly 1)
+  if(step===4){
+    const itemCode = l3ItemsOrder[varIdx];
+    const ctx = getItem(itemCode);
+    setTitle('Scenarios');
+    setHint(`Step 4 of 4 — Pick exactly <b>1</b> scenario for: ${ctx.c.title} › ${ctx.it.title}`);
+
+    const box = document.createElement('div'); box.className='panel';
+    const grp = document.createElement('div'); grp.className='group';
+    const hdr = document.createElement('div'); hdr.className='hdr';
+    hdr.innerHTML = `<div class="title">${ctx.it.title}</div><div class="cap">${varIdx+1}/${l3ItemsOrder.length} • ${ctx.it.code}</div>`;
+    grp.appendChild(hdr);
+
+    const variations = ctx.it.variations || [];
+    if(variations.length===0){
+      const w = document.createElement('div'); w.className='warn';
+      w.textContent = 'No primer scenarios found; a downstream API will provide personalized scenarios.';
+      grp.appendChild(w);
+    }else{
+      variations.forEach(v=>{
+        const line = document.createElement('label'); line.style.display='flex'; line.style.alignItems;'center'; line.style.margin='8px 0';
+        const r = document.createElement('input'); r.type='radio'; r.name=`var-${ctx.it.code}`; r.className='radio';
+        r.checked = varByItem.get(ctx.it.code)===v.code;
+        r.onchange = ()=> varByItem.set(ctx.it.code, v.code);
+        line.appendChild(r);
+        const span = document.createElement('span'); span.innerHTML = `<b>${v.code.split('.').pop()}</b>${v.example? ' — '+v.example:''}`;
+        line.appendChild(span);
+        grp.appendChild(line);
+      });
+
+      if(!varByItem.get(ctx.it.code)){
+        const w = document.createElement('div'); w.className='warn'; w.textContent='Select one scenario above.';
+        grp.appendChild(w);
+      }
+    }
+
+    box.appendChild(grp);
+    stage.appendChild(box);
+    return;
+  }
+}
+
+// Buttons
+document.getElementById('backBtn').onclick = ()=>{
+  if(step===2){
+    if(l1Idx>0){ l1Idx--; render(); }
+    else { step=1; render(); }
+    return;
+  }
+  if(step===3){
+    if(l2Idx>0){ l2Idx--; render(); }
+    else { step=2; l1Idx = Math.max(0, l1Order.length-1); render(); }
+    return;
+  }
+  if(step===4){
+    if(varIdx>0){ varIdx--; render(); }
+    else { step=3; l2Idx = Math.max(0, l2Order.length-1); render(); }
+    return;
+  }
+};
+
+document.getElementById('nextBtn').onclick = async ()=>{
+  if(!canNext()){ say('Complete the current step to continue.'); return; }
+
+  if(step===1){
+    lockL1Order();
+    pruneAfterL1Change();
+    step=2; render(); return;
+  }
+
+  if(step===2){
+    pruneAfterL2Change(l1Order[l1Idx]);
+    if(l1Idx < l1Order.length-1){ l1Idx++; render(); return; }
+    // finished all L1 in step 2 → build L2 order and continue
+    buildL2Order();
+    if(l2Order.length===0){ say('Select at least one Level 2 option to continue.'); return; }
+    step=3; render(); return;
+  }
+
+  if(step===3){
+    if(l2Idx < l2Order.length-1){ l2Idx++; render(); return; }
+    // finished all selected L2 → build items order
+    buildL3ItemsOrder();
+    if(l3ItemsOrder.length===0){ say('Select items in Step 3 to continue.'); return; }
+    step=4; render(); return;
+  }
+
+  if(step===4){
+    if(varIdx < l3ItemsOrder.length-1){ varIdx++; render(); return; }
+    await save(); return;
+  }
+};
+
+// Save
+async function save(){
+  const userId = (document.getElementById('userId').value||'').trim();
+  if(!userId){ say('Enter User ID'); return; }
+
+  const level1_codes = Array.from(selL1);
+  const level2_codes = [];
+  l1Order.forEach(l1=>{
+    (selL2ByL1.get(l1)||new Set()).forEach(c=> level2_codes.push(c));
+  });
+
+  const level3_choices = [];
+  l2Order.forEach(l2=>{
+    (selL3ByL2.get(l2)||new Set()).forEach(item=>{
+      const variant = varByItem.get(item);
+      if(variant) level3_choices.push({item_code:item, variant_code:variant});
+    });
+  });
+
+  try{
+    const r = await fetch('/api/selections', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:userId, level1_codes, level2_codes, level3_choices })
+    });
+    const j = await r.json();
+    if(!r.ok){ say(j.detail || 'Error saving'); return; }
+    say('Saved.');
+  }catch(e){
+    say('Network error saving.');
+  }
+}
+
+// Init
+(async function init(){
+  try{
+    const res = await fetch('/api/options'); data = await res.json();
+  }catch(e){
+    data = {groups:[]};
+  }
+  render();
+})();
+</script>
+</body>
+</html>

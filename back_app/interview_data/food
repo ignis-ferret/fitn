@@ -1,0 +1,411 @@
+from typing import Optional, List, Tuple
+
+
+diet_questions = {
+  "section": "1.4 Food, Diet, and Digestion",
+  "questions": [
+    {
+      "id": "1.4.1",
+      "variable_name": "diet_style",
+      "text": "Do you follow a specific diet or eating style?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.1.1", "text": "No"},
+        {"id": "1.4.1.2", "text": "Keto"},
+        {"id": "1.4.1.3", "text": "Paleo"},
+        {"id": "1.4.1.4", "text": "Mediterranean"},
+        {"id": "1.4.1.5", "text": "Vegetarian"},
+        {"id": "1.4.1.6", "text": "Vegan"},
+        {"id": "1.4.1.7", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.4.2",
+      "variable_name": "meals_at_home",
+      "text": "How many meals per day do you eat at home?",
+      "type": "number",
+      "range": {"min": 0, "max": 10}
+    },
+    {
+      "id": "1.4.3",
+      "variable_name": "meals_out",
+      "text": "How many meals per day do you eat out or order in?",
+      "type": "number",
+      "range": {"min": 0, "max": 10}
+    },
+    {
+      "id": "1.4.4",
+      "variable_name": "meal_duration",
+      "text": "How long does a typical meal take from prep to finish? (minutes)",
+      "type": "number"
+    },
+    {
+      "id": "1.4.5",
+      "variable_name": "use_eating_window",
+      "text": "Do you follow a specific eating window?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.5.1", "text": "No"},
+        {"id": "1.4.5.2", "text": "Yes"}
+      ]
+    },
+    {
+      "id": "1.4.5.2.1",
+      "variable_name": "eating_window_start",
+      "text": "If yes, what is the start time of your eating window? (hour + AM/PM)",
+      "type": "time"
+    },
+    {
+      "id": "1.4.5.2.2",
+      "variable_name": "eating_window_end",
+      "text": "If yes, what is the end time of your eating window? (hour + AM/PM)",
+      "type": "time"
+    },
+    {
+      "id": "1.4.6",
+      "variable_name": "meal_composition",
+      "text": "What’s your typical meal composition?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.6.1", "text": "High-protein"},
+        {"id": "1.4.6.2", "text": "High-carb"},
+        {"id": "1.4.6.3", "text": "High-fat"},
+        {"id": "1.4.6.4", "text": "Balanced"},
+        {"id": "1.4.6.5", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.4.7",
+      "variable_name": "food_allergies",
+      "text": "Do you have any food allergies or intolerances?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.4.7.1", "text": "Gluten"},
+        {"id": "1.4.7.2", "text": "Dairy"},
+        {"id": "1.4.7.3", "text": "Nuts"},
+        {"id": "1.4.7.4", "text": "Shellfish"},
+        {"id": "1.4.7.5", "text": "Soy"},
+        {"id": "1.4.7.6", "text": "Eggs"},
+        {"id": "1.4.7.7", "text": "Other"},
+        {"id": "1.4.7.8", "text": "None"}
+      ]
+    },
+    {
+      "id": "1.4.8",
+      "variable_name": "water_intake_cups",
+      "text": "How much water do you drink daily? (cups)",
+      "type": "number"
+    },
+    {
+      "id": "1.4.9",
+      "variable_name": "other_fluids",
+      "text": "Which of these other fluids do you consume regularly?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.4.9.1", "text": "Juice"},
+        {"id": "1.4.9.2", "text": "Soda"},
+        {"id": "1.4.9.3", "text": "Energy Drinks"},
+        {"id": "1.4.9.4", "text": "Coffee"},
+        {"id": "1.4.9.5", "text": "Tea"},
+        {"id": "1.4.9.6", "text": "Other"},
+        {"id": "1.4.9.7", "text": "None"}
+      ]
+    },
+    {
+      "id": "1.4.10",
+      "variable_name": "digestion_issues",
+      "text": "Do you experience any common digestion issues?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.4.10.1", "text": "Bloating"},
+        {"id": "1.4.10.2", "text": "Acid reflux"},
+        {"id": "1.4.10.3", "text": "Irregularity"},
+        {"id": "1.4.10.4", "text": "Gas"},
+        {"id": "1.4.10.5", "text": "None"}
+      ]
+    },
+    {
+      "id": "1.4.11",
+      "variable_name": "snacks_between_meals",
+      "text": "Do you snack between meals?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.11.1", "text": "Yes"},
+        {"id": "1.4.11.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.4.11.1.1",
+      "variable_name": "snacks_per_day",
+      "text": "If yes, how many snacks per day?",
+      "type": "number"
+    },
+    {
+      "id": "1.4.11.1.2",
+      "variable_name": "snack_type_sweet",
+      "text": "Snack type - Sweet",
+      "type": "boolean"
+    },
+    {
+      "id": "1.4.11.1.3",
+      "variable_name": "snack_type_salty",
+      "text": "Snack type - Salty",
+      "type": "boolean"
+    },
+    {
+      "id": "1.4.11.1.4",
+      "variable_name": "snack_type_fruit",
+      "text": "Snack type - Fruit",
+      "type": "boolean"
+    },
+    {
+      "id": "1.4.11.1.5",
+      "variable_name": "snack_type_protein",
+      "text": "Snack type - Protein",
+      "type": "boolean"
+    },
+    {
+      "id": "1.4.11.1.6",
+      "variable_name": "snack_type_other",
+      "text": "Snack type - Other",
+      "type": "boolean"
+    },
+    {
+      "id": "1.4.12",
+      "variable_name": "foods_to_avoid",
+      "text": "Are there any foods you want to avoid or limit?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.4.12.1", "text": "Gluten"},
+        {"id": "1.4.12.2", "text": "Dairy"},
+        {"id": "1.4.12.3", "text": "Sugar"},
+        {"id": "1.4.12.4", "text": "Red meat"},
+        {"id": "1.4.12.5", "text": "Processed foods"},
+        {"id": "1.4.12.6", "text": "Other"},
+        {"id": "1.4.12.7", "text": "None"}
+      ]
+    },
+    {
+      "id": "1.4.13",
+      "variable_name": "hungry_within_2_hours",
+      "text": "Do you often feel hungry within 2 hours after a meal?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.13.1", "text": "Yes"},
+        {"id": "1.4.13.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.4.14",
+      "variable_name": "hours_between_meals",
+      "text": "How many hours typically pass between your meals?",
+      "type": "number"
+    },
+    {
+      "id": "1.4.15",
+      "variable_name": "meals_prep_in_advance",
+      "text": "How many meals per week do you cook or prep in advance?",
+      "type": "number",
+      "range": {"min": 0, "max": 14}
+    }
+  ]
+}
+
+
+def time_str_to_slot(time_str: str) -> int:
+    """Convert 'HH:MM' 24h string to 5-min slot integer (0–287)."""
+    h, m = map(int, time_str.split(':'))
+    return h * 12 + m // 5
+
+def slot_to_time_str(slot: int) -> str:
+    """Convert 5-min slot integer back to 'HH:MM' string."""
+    h = slot // 12
+    m = (slot % 12) * 5
+    return f"{h:02d}:{m:02d}"
+
+def calculate_target_bedtime_slot(earliest_wake_str: str, typical_sleep_hours: float) -> int:
+    wake_slot = time_str_to_slot(earliest_wake_str)
+    sleep_slots = int(typical_sleep_hours * 12)
+    bedtime_slot = wake_slot - sleep_slots
+    if bedtime_slot < 0:
+        bedtime_slot += 288  # wrap around midnight
+    return bedtime_slot
+
+def adjust_bedtime_for_sleep_issues(
+    bedtime_slot: int,
+    trouble_sleeping: bool,
+    uses_sleep_aids: bool,
+    caffeine_intake_per_day: int,
+    caffeine_last_intake_slot: int,
+    tobacco_use: bool,
+    alcohol_use: bool,
+    cravings_evening: bool
+) -> int:
+    """
+    Adjust bedtime earlier if trouble sleeping and no aids.
+    Also consider caffeine/alcohol/tobacco and evening cravings delaying sleep.
+    """
+    adjusted_slot = bedtime_slot
+    
+    # Shift earlier 15 minutes if trouble sleeping and no aids
+    if trouble_sleeping and not uses_sleep_aids:
+        adjusted_slot -= 3  # 3 slots = 15 min
+
+    # If caffeine consumed late (within 6 hours of bedtime), shift bedtime later by 15 minutes
+    if caffeine_intake_per_day > 0:
+        diff = adjusted_slot - caffeine_last_intake_slot
+        if 0 <= diff < 72:  # 6 hours = 72 slots
+            adjusted_slot += 3  # delay bedtime 15 min
+
+    # If evening cravings present, possibly delay bedtime 15 min
+    if cravings_evening:
+        adjusted_slot += 3
+
+    # Tobacco and alcohol can disrupt sleep, but exact timing unknown
+    # Could add similar logic if timing info available
+
+    # Normalize to 0–287
+    adjusted_slot %= 288
+    return adjusted_slot
+
+def validate_sleep_schedule(bedtime_slot: int, latest_bedtime_str: str) -> Tuple[bool, int]:
+    latest_slot = time_str_to_slot(latest_bedtime_str)
+    if bedtime_slot > latest_slot:
+        return False, latest_slot
+    return True, bedtime_slot
+
+def generate_sleep_routine_recommendations(
+    trouble_sleeping: bool,
+    uses_sleep_aids: bool,
+    caffeine_intake_per_day: int,
+    tobacco_use: bool,
+    alcohol_use: bool
+) -> List[str]:
+    tips = []
+    if trouble_sleeping:
+        tips.append("Establish a calming pre-sleep routine.")
+        tips.append("Avoid screens 30 minutes before bedtime.")
+        if not uses_sleep_aids:
+            tips.append("Consider relaxation techniques like meditation or deep breathing.")
+    else:
+        tips.append("Maintain consistent sleep and wake times.")
+    
+    if caffeine_intake_per_day > 0:
+        tips.append("Limit caffeine intake, especially in the afternoon and evening.")
+    if tobacco_use:
+        tips.append("Avoid tobacco use close to bedtime.")
+    if alcohol_use:
+        tips.append("Limit alcohol consumption near bedtime for better sleep quality.")
+    
+    return tips
+
+def summarize_sleep_plan(bedtime_slot: int, wake_time_str: str, duration_hours: float, recommendations: List[str]) -> str:
+    bedtime_str = slot_to_time_str(bedtime_slot)
+    summary = (f"Sleep Plan:\n- Target bedtime: {bedtime_str}\n- Wake time: {wake_time_str}\n"
+               f"- Target duration: {duration_hours} hours\n- Recommendations:\n")
+    for tip in recommendations:
+        summary += f"  • {tip}\n"
+    return summary
+
+def calculate_bmr(weight_lbs, height_inches, age, gender):
+    weight_kg = weight_lbs * 0.4536
+    height_cm = height_inches * 2.54
+    if gender.lower() == 'male':
+        bmr = (10 * weight_kg) + (6.25 * height_cm) - (5 * age) + 5
+    elif gender.lower() == 'female':
+        bmr = (10 * weight_kg) + (6.25 * height_cm) - (5 * age) - 161
+    else:
+        raise ValueError("Gender must be 'male' or 'female'")
+    return bmr
+
+def calculate_bmi(weight_lbs, height_inches):
+    weight_kg = weight_lbs * 0.4536
+    height_m = height_inches * 0.0254
+    bmi = weight_kg / (height_m ** 2)
+    return bmi
+
+def get_bmr_multiplier(category):
+    mapping = {
+        1: 1.2,    # Sedentary
+        2: 1.375,  # Light activity
+        3: 1.55,   # Moderate activity
+        4: 1.725,  # High activity
+        5: 1.9     # Very high activity
+    }
+    try:
+        category_int = int(category)
+    except (ValueError, TypeError):
+        return 1.2  # Default sedentary multiplier for invalid input
+    return mapping.get(category_int, 1.2)
+
+def get_activity_multiplier(daily_minutes, fitness_goals):
+    """
+    daily_minutes: int, minutes available for fitness per day
+    fitness_goals: list of ints, e.g., [1, 2, 6] corresponding to:
+        1 - Weight loss / fat reduction
+        2 - Muscle gain / strength building
+        3 - Improved energy / reduced fatigue
+        4 - Better sleep quality
+        5 - Stress management / anxiety reduction
+        6 - Cardiovascular endurance
+        7 - Flexibility / joint mobility
+        8 - Healthy eating / nutrition
+        9 - Digestive health / gut comfort
+        10 - Long-term health maintenance / disease prevention
+        11 - Other
+    
+    Returns: float, activity multiplier
+    """
+    moderate_goals = {1, 2, 6, 7}  # goals implying moderate activity
+    light_goals = {3, 4, 5, 8, 9}  # goals implying light activity
+
+    if daily_minutes >= 60 and any(goal in fitness_goals for goal in moderate_goals):
+        return 1.55  # Moderate activity
+    elif daily_minutes >= 30 and any(goal in fitness_goals for goal in moderate_goals.union(light_goals)):
+        return 1.375  # Light activity
+    else:
+        return 1.2  # Sedentary
+
+def generate_meal_times(
+    eating_window: Optional[tuple],  # (start_hour, end_hour) in 24h format, e.g., (12, 20)
+    meals_per_day: int,
+    hours_between_meals: Optional[float] = None
+) -> List[str]:
+    """
+    Generate meal times as strings 'HH:MM', spaced within eating window or by hours_between_meals.
+    If no window or spacing provided, defaults to 3 meals spaced evenly from 7 AM.
+    """
+    if meals_per_day <= 0:
+        return []
+    
+    if eating_window:
+        start, end = eating_window
+        # Handle overnight window
+        total_hours = (end - start) % 24 or 24
+        interval = total_hours / max(meals_per_day - 1, 1)
+        meal_hours = [(start + i * interval) % 24 for i in range(meals_per_day)]
+    elif hours_between_meals:
+        meal_hours = []
+        current_hour = 7  # default start time
+        for _ in range(meals_per_day):
+            meal_hours.append(current_hour % 24)
+            current_hour += hours_between_meals
+    else:
+        interval = 12 / max(meals_per_day - 1, 1)
+        meal_hours = [7 + i * interval for i in range(meals_per_day)]
+    
+    # Format as HH:MM strings
+    meal_times = [f"{int(h):02d}:{int((h - int(h)) * 60):02d}" for h in meal_hours]
+    return meal_times
+
+age = 39
+gender = "female"
+weight_raw = 197
+height_raw = 66
+bmr_multiplier_category = 1 
+daily_minutes = 45
+fitness_goals = [1, 3, 5]
+activity_multiplier = get_activity_multiplier(daily_minutes, fitness_goals)
+bmi = calculate_bmi(weight_raw,height_raw)
+bmr = calculate_bmr(weight_raw,height_raw,age,gender)
+tdee = bmr * activity_multiplier

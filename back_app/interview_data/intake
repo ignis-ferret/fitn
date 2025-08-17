@@ -1,0 +1,1587 @@
+
+identity_questions = {
+  "section": "1.1 Identity & Physical Baseline",
+  "questions": [
+    {
+      "id": "1.1.1",
+      "variable_name": "gender",
+      "text": "What’s your gender?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.1.1.1", "text": "male"},
+        {"id": "1.1.1.2", "text": "female"}
+      ]
+    },
+    {
+      "id": "1.1.2",
+      "variable_name": "height_inches",
+      "text": "What’s your height? (inches)",
+      "type": "number",
+      "range": {"min": 36, "max": 96}  # Example reasonable range
+    },
+    {
+      "id": "1.1.3",
+      "variable_name": "age",
+      "text": "What’s your age?",
+      "type": "number"
+    },
+    {
+      "id": "1.1.4",
+      "variable_name": "current_weight_lbs",
+      "text": "What’s your current weight? (pounds)",
+      "type": "number"
+    },
+    {
+      "id": "1.1.5",
+      "variable_name": "body_fat_percentage",
+      "text": "What’s your approximate body fat percentage? (optional)",
+      "type": "number",
+      "optional": True
+    },
+    {
+      "id": "1.1.6",
+      "variable_name": "target_weight_lbs",
+      "text": "What’s your target weight? (pounds)",
+      "type": "number"
+    },
+    {
+      "id": "1.1.7",
+      "variable_name": "target_body_area",
+      "text": "Do you want to target a specific area of your body for improvement?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.1.7.1", "text": "no"},
+        {"id": "1.1.7.2", "text": "belly"},
+        {"id": "1.1.7.3", "text": "thighs"},
+        {"id": "1.1.7.4", "text": "chest"},
+        {"id": "1.1.7.5", "text": "arms"},
+        {"id": "1.1.7.6", "text": "glutes"},
+        {"id": "1.1.7.7", "text": "back"},
+        {"id": "1.1.7.8", "text": "full body"},
+        {"id": "1.1.7.9", "text": "other"}
+      ]
+    }
+  ]
+}
+
+daily_rhythm_questions = {
+  "section": "1.2 Daily Rhythm & Structure",
+  "questions": [
+    {
+      "id": "1.2.5",
+      "variable_name": "has_daily_responsibilities",
+      "text": "Do you have daily responsibilities that occupy specific hours?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.2.5.1", "text": "yes"},
+        {"id": "1.2.5.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.2.6",
+      "variable_name": "responsibility_days_per_week",
+      "text": "If yes, how many days per week are those responsibilities scheduled? (0–7)",
+      "type": "number",
+      "range": {"min": 0, "max": 7},
+      "conditional_on": {"variable_name": "has_daily_responsibilities", "value": "yes"}
+    },
+    {
+      "id": "1.2.7_start",
+      "variable_name": "responsibility_start_time",
+      "text": "What time do your daily responsibilities start? (HH:MM, 24-hour)",
+      "type": "time_24h",
+      "conditional_on": {"variable_name": "has_daily_responsibilities", "value": "yes"}
+    },
+    {
+      "id": "1.2.7_end",
+      "variable_name": "responsibility_end_time",
+      "text": "What time do your daily responsibilities end? (HH:MM, 24-hour)",
+      "type": "time_24h",
+      "conditional_on": {"variable_name": "has_daily_responsibilities", "value": "yes"}
+    },
+    {
+      "id": "1.2.8a",
+      "variable_name": "pet_care_morning",
+      "text": "Do you care for pets in the morning?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.2.8a.1", "text": "yes"},
+        {"id": "1.2.8a.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.2.8a_start",
+      "variable_name": "pet_care_morning_start_time",
+      "text": "What time do you typically start morning pet care? (HH:MM, 24-hour)",
+      "type": "time_24h",
+      "conditional_on": {"variable_name": "pet_care_morning", "value": "yes"}
+    },
+    {
+      "id": "1.2.8a_end",
+      "variable_name": "pet_care_morning_end_time",
+      "text": "What time do you typically finish morning pet care? (HH:MM, 24-hour)",
+      "type": "time_24h",
+      "conditional_on": {"variable_name": "pet_care_morning", "value": "yes"}
+    },
+
+    {
+      "id": "1.2.8b",
+      "variable_name": "pet_care_evening",
+      "text": "Do you care for pets in the evening?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.2.8b.1", "text": "yes"},
+        {"id": "1.2.8b.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.2.8b_start",
+      "variable_name": "pet_care_evening_start_time",
+      "text": "What time do you typically start evening pet care? (HH:MM, 24-hour)",
+      "type": "time_24h",
+      "conditional_on": {"variable_name": "pet_care_evening", "value": "yes"}
+    },
+    {
+      "id": "1.2.8b_end",
+      "variable_name": "pet_care_evening_end_time",
+      "text": "What time do you typically finish evening pet care? (HH:MM, 24-hour)",
+      "type": "time_24h",
+      "conditional_on": {"variable_name": "pet_care_evening", "value": "yes"}
+    },
+    {
+      "id": "1.2.9",
+      "variable_name": "others_rely_on_time",
+      "text": "Do other people regularly rely on your time or attention during the day?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.2.9.1", "text": "yes"},
+        {"id": "1.2.9.2", "text": "no"}
+      ]
+    }
+  ]
+}
+
+substances_questions = {
+  "section": "1.3 Substances & Regulation",
+  "questions": [
+    {
+      "id": "1.3.1",
+      "variable_name": "use_tobacco",
+      "text": "Do you currently use tobacco products?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.1.1", "text": "Yes"},
+        {"id": "1.3.1.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.3.2",
+      "variable_name": "tobacco_type",
+      "text": "If yes, what type?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.3.2.1", "text": "Cigarette"},
+        {"id": "1.3.2.2", "text": "Cigar"},
+        {"id": "1.3.2.3", "text": "Vape"},
+        {"id": "1.3.2.4", "text": "Chewing tobacco"},
+        {"id": "1.3.2.5", "text": "Other"}
+      ],
+      "conditional_on": {"variable_name": "use_tobacco", "value": "Yes"}
+    },
+    {
+      "id": "1.3.3",
+      "variable_name": "tobacco_quantity",
+      "text": "How many?",
+      "type": "number",
+      "conditional_on": {"variable_name": "use_tobacco", "value": "Yes"}
+    },
+    {
+      "id": "1.3.4",
+      "variable_name": "tobacco_frequency",
+      "text": "Frequency",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.4.1", "text": "Per day"},
+        {"id": "1.3.4.2", "text": "Per week"}
+      ],
+      "conditional_on": {"variable_name": "use_tobacco", "value": "Yes"}
+    },
+    {
+      "id": "1.3.5",
+      "variable_name": "tobacco_goal",
+      "text": "Goal for this plan:",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.5.1", "text": "No change"},
+        {"id": "1.3.5.2", "text": "Reduce"},
+        {"id": "1.3.5.3", "text": "Quit entirely"}
+      ],
+      "conditional_on": {"variable_name": "use_tobacco", "value": "Yes"}
+    },
+    {
+      "id": "1.3.6",
+      "variable_name": "tobacco_cravings_time",
+      "text": "Strongest cravings:",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.6.1", "text": "All day"},
+        {"id": "1.3.6.2", "text": "Mornings"},
+        {"id": "1.3.6.3", "text": "Afternoons"},
+        {"id": "1.3.6.4", "text": "Evenings"},
+        {"id": "1.3.6.5", "text": "Late nights"},
+        {"id": "1.3.6.6", "text": "Weekends"},
+        {"id": "1.3.6.7", "text": "None"}
+      ],
+      "conditional_on": {"variable_name": "use_tobacco", "value": "Yes"}
+    },
+    {
+      "id": "1.3.7",
+      "variable_name": "use_marijuana",
+      "text": "Do you currently use marijuana?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.7.1", "text": "Yes"},
+        {"id": "1.3.7.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.3.8",
+      "variable_name": "marijuana_type",
+      "text": "If yes, what type?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.3.8.1", "text": "Joint"},
+        {"id": "1.3.8.2", "text": "Edible"},
+        {"id": "1.3.8.3", "text": "Vape"},
+        {"id": "1.3.8.4", "text": "Tincture"},
+        {"id": "1.3.8.5", "text": "Other"}
+      ],
+      "conditional_on": {"variable_name": "use_marijuana", "value": "Yes"}
+    },
+    {
+      "id": "1.3.9",
+      "variable_name": "marijuana_quantity",
+      "text": "How many?",
+      "type": "number",
+      "conditional_on": {"variable_name": "use_marijuana", "value": "Yes"}
+    },
+    {
+      "id": "1.3.10",
+      "variable_name": "marijuana_frequency",
+      "text": "Frequency",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.10.1", "text": "Per day"},
+        {"id": "1.3.10.2", "text": "Per week"}
+      ],
+      "conditional_on": {"variable_name": "use_marijuana", "value": "Yes"}
+    },
+    {
+      "id": "1.3.11",
+      "variable_name": "marijuana_goal",
+      "text": "Goal for this plan:",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.11.1", "text": "No change"},
+        {"id": "1.3.11.2", "text": "Reduce"},
+        {"id": "1.3.11.3", "text": "Quit entirely"}
+      ],
+      "conditional_on": {"variable_name": "use_marijuana", "value": "Yes"}
+    },
+    {
+      "id": "1.3.12",
+      "variable_name": "marijuana_cravings_time",
+      "text": "Strongest cravings:",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.12.1", "text": "All day"},
+        {"id": "1.3.12.2", "text": "Mornings"},
+        {"id": "1.3.12.3", "text": "Afternoons"},
+        {"id": "1.3.12.4", "text": "Evenings"},
+        {"id": "1.3.12.5", "text": "Late nights"},
+        {"id": "1.3.12.6", "text": "Weekends"},
+        {"id": "1.3.12.7", "text": "None"}
+      ],
+      "conditional_on": {"variable_name": "use_marijuana", "value": "Yes"}
+    },
+    {
+      "id": "1.3.13",
+      "variable_name": "use_alcohol",
+      "text": "Do you drink alcohol?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.13.1", "text": "Yes"},
+        {"id": "1.3.13.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.3.14",
+      "variable_name": "alcohol_quantity",
+      "text": "How many drinks?",
+      "type": "number",
+      "conditional_on": {"variable_name": "use_alcohol", "value": "Yes"}
+    },
+    {
+      "id": "1.3.15",
+      "variable_name": "alcohol_frequency",
+      "text": "Frequency",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.15.1", "text": "Per day"},
+        {"id": "1.3.15.2", "text": "Per week"}
+      ],
+      "conditional_on": {"variable_name": "use_alcohol", "value": "Yes"}
+    },
+    {
+      "id": "1.3.16",
+      "variable_name": "alcohol_goal",
+      "text": "Goal for this plan:",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.16.1", "text": "No change"},
+        {"id": "1.3.16.2", "text": "Reduce"},
+        {"id": "1.3.16.3", "text": "Quit entirely"}
+      ],
+      "conditional_on": {"variable_name": "use_alcohol", "value": "Yes"}
+    },
+    {
+      "id": "1.3.17",
+      "variable_name": "alcohol_cravings_time",
+      "text": "Strongest cravings:",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.17.1", "text": "All day"},
+        {"id": "1.3.17.2", "text": "Mornings"},
+        {"id": "1.3.17.3", "text": "Afternoons"},
+        {"id": "1.3.17.4", "text": "Evenings"},
+        {"id": "1.3.17.5", "text": "Late nights"},
+        {"id": "1.3.17.6", "text": "Weekends"},
+        {"id": "1.3.17.7", "text": "None"}
+      ],
+      "conditional_on": {"variable_name": "use_alcohol", "value": "Yes"}
+    },
+    {
+      "id": "1.3.18",
+      "variable_name": "use_caffeine",
+      "text": "Do you drink caffeine?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.18.1", "text": "Yes"},
+        {"id": "1.3.18.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.3.19",
+      "variable_name": "caffeine_type",
+      "text": "If yes, what type?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.3.19.1", "text": "Coffee"},
+        {"id": "1.3.19.2", "text": "Energy drink"},
+        {"id": "1.3.19.3", "text": "Tea"},
+        {"id": "1.3.19.4", "text": "Soda"},
+        {"id": "1.3.19.5", "text": "Other"}
+      ],
+      "conditional_on": {"variable_name": "use_caffeine", "value": "Yes"}
+    },
+    {
+      "id": "1.3.20",
+      "variable_name": "caffeine_quantity",
+      "text": "How much?",
+      "type": "number",
+      "conditional_on": {"variable_name": "use_caffeine", "value": "Yes"}
+    },
+    {
+      "id": "1.3.21",
+      "variable_name": "caffeine_frequency",
+      "text": "Frequency",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.21.1", "text": "Per day"},
+        {"id": "1.3.21.2", "text": "Per week"}
+      ],
+      "conditional_on": {"variable_name": "use_caffeine", "value": "Yes"}
+    },
+    {
+      "id": "1.3.22",
+      "variable_name": "caffeine_goal",
+      "text": "Goal for this plan:",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.22.1", "text": "No change"},
+        {"id": "1.3.22.2", "text": "Reduce"},
+        {"id": "1.3.22.3", "text": "Quit entirely"}
+      ],
+      "conditional_on": {"variable_name": "use_caffeine", "value": "Yes"}
+    },
+    {
+      "id": "1.3.23",
+      "variable_name": "caffeine_cravings_time",
+      "text": "Strongest cravings:",
+      "type": "single-select",
+      "options": [
+        {"id": "1.3.23.1", "text": "All day"},
+        {"id": "1.3.23.2", "text": "Mornings"},
+        {"id": "1.3.23.3", "text": "Afternoons"},
+        {"id": "1.3.23.4", "text": "Evenings"},
+        {"id": "1.3.23.5", "text": "Late nights"},
+        {"id": "1.3.23.6", "text": "Weekends"},
+        {"id": "1.3.23.7", "text": "None"}
+      ],
+      "conditional_on": {"variable_name": "use_caffeine", "value": "Yes"}
+    }
+  ]
+}
+
+medications_questions = {
+  "section": "1.5 Medications & Supplements",
+  "questions": [
+    {
+      "id": "1.5.1",
+      "variable_name": "take_daily_meds_supplements",
+      "text": "Do you take any prescriptions, supplements, or vitamins daily?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.5.1.1", "text": "yes"},
+        {"id": "1.5.1.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.5.2",
+      "variable_name": "meds_supplements_times",
+      "text": "At what times do you typically take them?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.5.2.1", "text": "early morning (6–9 AM)"},
+        {"id": "1.5.2.2", "text": "mid-day (11 AM–2 PM)"},
+        {"id": "1.5.2.3", "text": "afternoon (2–5 PM)"},
+        {"id": "1.5.2.4", "text": "evening (5–8 PM)"},
+        {"id": "1.5.2.5", "text": "bedtime (8–11 PM)"},
+        {"id": "1.5.2.6", "text": "as needed"}
+      ],
+      "conditional_on": {"variable_name": "take_daily_meds_supplements", "value": "yes"}
+    },
+    {
+      "id": "1.5.3",
+      "variable_name": "include_med_reminders",
+      "text": "Should I include reminders for your meds or supplements at those times?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.5.3.1", "text": "yes"},
+        {"id": "1.5.3.2", "text": "no"}
+      ],
+      "conditional_on": {"variable_name": "take_daily_meds_supplements", "value": "yes"}
+    }
+  ]
+}
+
+fitness_questions = {
+  "section": "1.7 Fitness & Physical Capacity",
+  "questions": [
+    {
+      "id": "1.7.1",
+      "variable_name": "gym_access",
+      "text": "Do you have access to a gym or fitness facility?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.7.1.1", "text": "yes"},
+        {"id": "1.7.1.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.7.2",
+      "variable_name": "preferred_workout_location",
+      "text": "Where do you prefer to work out?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.7.2.1", "text": "at home"},
+        {"id": "1.7.2.2", "text": "gym or fitness center"},
+        {"id": "1.7.2.3", "text": "outdoors (parks, trails)"},
+        {"id": "1.7.2.4", "text": "studio or class (yoga, spin, etc.)"},
+        {"id": "1.7.2.5", "text": "do not prefer to work out"},
+        {"id": "1.7.2.6", "text": "other"}
+      ]
+    },
+    {
+      "id": "1.7.3",
+      "variable_name": "home_fitness_equipment",
+      "text": "Which fitness equipment do you have available at home?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.7.3.1", "text": "resistance bands"},
+        {"id": "1.7.3.2", "text": "dumbbells or kettlebells"},
+        {"id": "1.7.3.3", "text": "barbell or weight plates"},
+        {"id": "1.7.3.4", "text": "cardio machine (bike, treadmill, rower)"},
+        {"id": "1.7.3.5", "text": "yoga mat or floor space"},
+        {"id": "1.7.3.6", "text": "none"},
+        {"id": "1.7.3.7", "text": "other"}
+      ]
+    },
+    {
+      "id": "1.7.4",
+      "variable_name": "injuries_or_limitations",
+      "text": "Do you have any injuries or physical limitations?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.7.4.1", "text": "yes"},
+        {"id": "1.7.4.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.7.5",
+      "variable_name": "exercise_types_enjoyed",
+      "text": "Which types of exercise do you enjoy?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.7.5.1", "text": "strength training (weights, bodyweight)"},
+        {"id": "1.7.5.2", "text": "cardio (running, biking, HIIT)"},
+        {"id": "1.7.5.3", "text": "flexibility or mobility (yoga, stretching)"},
+        {"id": "1.7.5.4", "text": "balance or stability (Pilates, tai chi)"},
+        {"id": "1.7.5.5", "text": "sports or recreational activities"},
+        {"id": "1.7.5.6", "text": "do not enjoy exercising"},
+        {"id": "1.7.5.7", "text": "other"}
+      ]
+    },
+    {
+      "id": "1.7.6",
+      "variable_name": "preferred_workout_time",
+      "text": "What time of day do you prefer to work out?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.7.6.1", "text": "early morning (5–8 AM)"},
+        {"id": "1.7.6.2", "text": "late morning (8–11 AM)"},
+        {"id": "1.7.6.3", "text": "afternoon (11 AM–3 PM)"},
+        {"id": "1.7.6.4", "text": "late afternoon (3–6 PM)"},
+        {"id": "1.7.6.5", "text": "evening (6–9 PM)"}
+      ]
+    },
+    {
+      "id": "1.7.7",
+      "variable_name": "daily_fitness_minutes",
+      "text": "How much time can you dedicate to fitness each day? (minutes)",
+      "type": "number"
+    },
+    {
+      "id": "1.7.8",
+      "variable_name": "current_activity_level",
+      "text": "How would you describe your current activity level?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.7.8.1", "text": "sedentary"},
+        {"id": "1.7.8.2", "text": "light activity (1–2 days/week)"},
+        {"id": "1.7.8.3", "text": "moderate activity (3–5 days/week)"},
+        {"id": "1.7.8.4", "text": "high activity (6–7 days/week)"}
+      ]
+    },
+    {
+      "id": "1.7.9",
+      "variable_name": "fitness_goals",
+      "text": "Do you have specific fitness goals?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.7.9.1", "text": "increase strength"},
+        {"id": "1.7.9.2", "text": "improve endurance"},
+        {"id": "1.7.9.3", "text": "enhance flexibility"},
+        {"id": "1.7.9.4", "text": "lose body fat"},
+        {"id": "1.7.9.5", "text": "build muscle"},
+        {"id": "1.7.9.6", "text": "improve balance/coordination"},
+        {"id": "1.7.9.7", "text": "other"},
+        {"id": "1.7.9.8", "text": "no specific goals"}
+      ]
+    }
+  ]
+}
+
+sexual_wellness_questions = {
+  "section": "1.8 Sexual Wellness",
+  "questions": [
+    {
+      "id": "1.8.1",
+      "variable_name": "sexual_partners_per_month",
+      "text": "How many different sexual partners per month? (number)",
+      "type": "number"
+    },
+    {
+      "id": "1.8.2",
+      "variable_name": "partnered_sex_frequency_per_week",
+      "text": "Current partnered sex frequency per week? (number)",
+      "type": "number"
+    },
+    {
+      "id": "1.8.3",
+      "variable_name": "solo_play_frequency_per_week",
+      "text": "Current solo play frequency per week? (number)",
+      "type": "number"
+    },
+    {
+      "id": "1.8.4",
+      "variable_name": "relationship_status",
+      "text": "Relationship status",
+      "type": "single-select",
+      "options": [
+        {"id": "1.8.4.1", "text": "single"},
+        {"id": "1.8.4.2", "text": "monogamous partnership only"},
+        {"id": "1.8.4.3", "text": "monogamous partnership (exploring)"},
+        {"id": "1.8.4.4", "text": "open relationship"},
+        {"id": "1.8.4.5", "text": "polyamorous"},
+        {"id": "1.8.4.6", "text": "other"}
+      ]
+    },
+    {
+      "id": "1.8.5",
+      "variable_name": "sexual_orientation",
+      "text": "Sexual orientation",
+      "type": "single-select",
+      "options": [
+        {"id": "1.8.5.1", "text": "straight"},
+        {"id": "1.8.5.2", "text": "gay"},
+        {"id": "1.8.5.3", "text": "bisexual"},
+        {"id": "1.8.5.4", "text": "pansexual"},
+        {"id": "1.8.5.5", "text": "other"}
+      ]
+    },
+    {
+      "id": "1.8.6",
+      "variable_name": "solo_play_methods",
+      "text": "Usual solo-play methods",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.8.6.1", "text": "manual stimulation"},
+        {"id": "1.8.6.2", "text": "vibrator or toy"},
+        {"id": "1.8.6.3", "text": "porn or erotic media"},
+        {"id": "1.8.6.4", "text": "other"}
+      ]
+    },
+    {
+      "id": "1.8.7",
+      "variable_name": "partnered_activity_types",
+      "text": "Usual partnered-activity types",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.8.7.1", "text": "vaginal intercourse"},
+        {"id": "1.8.7.2", "text": "anal intercourse"},
+        {"id": "1.8.7.3", "text": "oral sex (giving)"},
+        {"id": "1.8.7.4", "text": "oral sex (receiving)"},
+        {"id": "1.8.7.5", "text": "other"}
+      ]
+    },
+    {
+      "id": "1.8.8",
+      "variable_name": "regular_uninterrupted_time_for_sexual_activity",
+      "text": "Do you have regular uninterrupted time for sexual activity?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.8.8.1", "text": "yes"},
+        {"id": "1.8.8.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.8.9",
+      "variable_name": "satisfaction_with_frequency",
+      "text": "Satisfaction with frequency",
+      "type": "single-select",
+      "options": [
+        {"id": "1.8.9.1", "text": "very satisfied"},
+        {"id": "1.8.9.2", "text": "somewhat satisfied"},
+        {"id": "1.8.9.3", "text": "neutral"},
+        {"id": "1.8.9.4", "text": "somewhat dissatisfied"},
+        {"id": "1.8.9.5", "text": "very dissatisfied"}
+      ]
+    },
+    {
+      "id": "1.8.10",
+      "variable_name": "satisfaction_with_quality",
+      "text": "Satisfaction with quality",
+      "type": "single-select",
+      "options": [
+        {"id": "1.8.10.1", "text": "very satisfied"},
+        {"id": "1.8.10.2", "text": "somewhat satisfied"},
+        {"id": "1.8.10.3", "text": "neutral"},
+        {"id": "1.8.10.4", "text": "somewhat dissatisfied"},
+        {"id": "1.8.10.5", "text": "very dissatisfied"}
+      ]
+    },
+    {
+      "id": "1.8.11",
+      "variable_name": "contraception_safety_methods",
+      "text": "Contraception & safety methods",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.8.11.1", "text": "condoms"},
+        {"id": "1.8.11.2", "text": "hormonal birth control"},
+        {"id": "1.8.11.3", "text": "IUD or implant"},
+        {"id": "1.8.11.4", "text": "barrier methods"},
+        {"id": "1.8.11.5", "text": "none"},
+        {"id": "1.8.11.6", "text": "other"}
+      ]
+    },
+    {
+      "id": "1.8.12",
+      "variable_name": "menstrual_periods",
+      "text": "Menstrual periods? (female only)",
+      "type": "single-select",
+      "options": [
+        {"id": "1.8.12.1f", "text": "yes"},
+        {"id": "1.8.12.2f", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.8.12.1f.1",
+      "variable_name": "track_cycle",
+      "text": "Do you track your menstrual cycle?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.8.12.1.1", "text": "yes"},
+        {"id": "1.8.12.1.2", "text": "no"}
+      ],
+      "conditional_on": {"variable_name": "menstrual_periods", "value": "yes"}
+    },
+    {
+      "id": "1.8.12.1f.2",
+      "variable_name": "menstrual_phase",
+      "text": "Which phase are you currently in?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.8.12.1.2.1", "text": "menstrual"},
+        {"id": "1.8.12.1.2.2", "text": "follicular"},
+        {"id": "1.8.12.1.2.3", "text": "ovulation"},
+        {"id": "1.8.12.1.2.4", "text": "luteal"}
+      ],
+      "conditional_on": {"variable_name": "menstrual_periods", "value": "yes"}
+    },
+    {
+      "id": "1.8.13",
+      "variable_name": "male_performance_goals",
+      "text": "Do you have any Performance goals – male",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.8.13.1m", "text": "stamina"},
+        {"id": "1.8.13.2m", "text": "control / delay orgasm"},
+        {"id": "1.8.13.3m", "text": "orgasm intensity"},
+        {"id": "1.8.13.4m", "text": "libido / arousal"},
+        {"id": "1.8.13.5m", "text": "erection quality"},
+        {"id": "1.8.13.6m", "text": "ejaculatory volume"},
+        {"id": "1.8.13.7m", "text": "reduce performance anxiety"},
+        {"id": "1.8.13.8m", "text": "enhance partner satisfaction"},
+        {"id": "1.8.13.9m", "text": "other"}
+      ]
+    },
+    {
+      "id": "1.8.14",
+      "variable_name": "female_performance_goals",
+      "text": "Do you have any Performance goals – female",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.8.14.1f", "text": "stamina"},
+        {"id": "1.8.14.2f", "text": "control / delay orgasm"},
+        {"id": "1.8.14.3f", "text": "orgasm intensity (clitoral or G-spot)"},
+        {"id": "1.8.14.4f", "text": "libido / arousal"},
+        {"id": "1.8.14.5f", "text": "natural lubrication"},
+        {"id": "1.8.14.6f", "text": "clitoral sensitivity"},
+        {"id": "1.8.14.7f", "text": "multiple orgasms"},
+        {"id": "1.8.14.8f", "text": "reduce discomfort or pain"},
+        {"id": "1.8.14.9f", "text": "intimacy / sensual connection"},
+        {"id": "1.8.14.10f", "text": "other"}
+      ]
+    },
+    {
+      "id": "1.8.15",
+      "variable_name": "issues_with_stamina_control_sensitivity_or_discomfort",
+      "text": "Do you experience any issues with stamina, control, sensitivity, or discomfort?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.8.15.1", "text": "yes"},
+        {"id": "1.8.15.2", "text": "no"}
+      ]
+    }
+  ]
+}
+
+stress_work_tech_questions = {
+  "section": "1.9 Stress, Work, Tech",
+  "questions": [
+    {
+      "id": "1.9.1",
+      "variable_name": "daily_stress_causes",
+      "text": "Which of these cause you the most daily stress? (select up to 3)",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.9.1.1", "text": "Work deadlines"},
+        {"id": "1.9.1.2", "text": "Financial concerns"},
+        {"id": "1.9.1.3", "text": "Relationship issues"},
+        {"id": "1.9.1.4", "text": "Health worries"},
+        {"id": "1.9.1.5", "text": "Family or caregiving"},
+        {"id": "1.9.1.6", "text": "Time pressure"},
+        {"id": "1.9.1.7", "text": "Information overload"},
+        {"id": "1.9.1.8", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.9.2",
+      "variable_name": "uses_stress_relief_tools",
+      "text": "Do you currently use any stress-relief or mindfulness tools?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.9.2.1", "text": "no"},
+        {"id": "1.9.2.2", "text": "yes"}
+      ]
+    },
+    {
+      "id": "1.9.2.2.1",
+      "variable_name": "stress_tool_meditation_app",
+      "text": "Meditation app",
+      "type": "boolean",
+      "conditional_on": {"variable_name": "uses_stress_relief_tools", "value": "yes"}
+    },
+    {
+      "id": "1.9.2.2.2",
+      "variable_name": "stress_tool_journaling",
+      "text": "Journaling",
+      "type": "boolean",
+      "conditional_on": {"variable_name": "uses_stress_relief_tools", "value": "yes"}
+    },
+    {
+      "id": "1.9.2.2.3",
+      "variable_name": "stress_tool_deep_breathing",
+      "text": "Deep breathing",
+      "type": "boolean",
+      "conditional_on": {"variable_name": "uses_stress_relief_tools", "value": "yes"}
+    },
+    {
+      "id": "1.9.2.2.4",
+      "variable_name": "stress_tool_yoga",
+      "text": "Yoga",
+      "type": "boolean",
+      "conditional_on": {"variable_name": "uses_stress_relief_tools", "value": "yes"}
+    },
+    {
+      "id": "1.9.2.2.5",
+      "variable_name": "stress_tool_other",
+      "text": "Other",
+      "type": "boolean",
+      "conditional_on": {"variable_name": "uses_stress_relief_tools", "value": "yes"}
+    },
+    {
+      "id": "1.9.3",
+      "variable_name": "can_take_breaks",
+      "text": "Can you take breaks during your main responsibilities?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.9.3.1", "text": "yes"},
+        {"id": "1.9.3.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.9.4",
+      "variable_name": "has_space_for_movement_sessions",
+      "text": "Do you have space or time for short movement sessions during the day?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.9.4.1", "text": "yes"},
+        {"id": "1.9.4.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.9.5",
+      "variable_name": "preferred_time_for_unscheduled_activities",
+      "text": "Which part of your day is more flexible for unscheduled activities?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.9.5.1", "text": "mornings"},
+        {"id": "1.9.5.2", "text": "afternoons"},
+        {"id": "1.9.5.3", "text": "evenings"},
+        {"id": "1.9.5.4", "text": "no clear preference"}
+      ]
+    },
+    {
+      "id": "1.9.6",
+      "variable_name": "desired_free_time_per_day_hours",
+      "text": "How many hours of free or unscheduled time do you want each day? (0–12)",
+      "type": "number"
+    },
+    {
+      "id": "1.9.7",
+      "variable_name": "screen_time_outside_work_hours",
+      "text": "Outside of work or study, how many hours per day do you spend on screens? (0–12)",
+      "type": "number"
+    },
+    {
+      "id": "1.9.8",
+      "variable_name": "sleep_with_phone_in_room",
+      "text": "Do you sleep with your phone or other devices in the same room?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.9.8.1", "text": "yes"},
+        {"id": "1.9.8.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.9.9",
+      "variable_name": "preferred_mental_reset_activities",
+      "text": "Which mental-reset activities work best for you? (select up to 3)",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.9.9.1", "text": "Silence / quiet"},
+        {"id": "1.9.9.2", "text": "Music"},
+        {"id": "1.9.9.3", "text": "Games or puzzles"},
+        {"id": "1.9.9.4", "text": "Nature / outdoors"},
+        {"id": "1.9.9.5", "text": "Guided meditation"},
+        {"id": "1.9.9.6", "text": "Movement / stretching"},
+        {"id": "1.9.9.7", "text": "Social connection"},
+        {"id": "1.9.9.8", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.9.10",
+      "variable_name": "coping_mechanisms_when_stressed",
+      "text": "When you feel stressed, which coping mechanisms do you use?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.9.10.1", "text": "Alcohol"},
+        {"id": "1.9.10.2", "text": "Tobacco"},
+        {"id": "1.9.10.3", "text": "Marijuana or cannabis"},
+        {"id": "1.9.10.4", "text": "Caffeine"},
+        {"id": "1.9.10.5", "text": "Eating or snacking"},
+        {"id": "1.9.10.6", "text": "Excessive screen time"},
+        {"id": "1.9.10.7", "text": "Impulse spending / shopping"},
+        {"id": "1.9.10.8", "text": "Avoidance / procrastination"},
+        {"id": "1.9.10.9", "text": "Self-harm or self-injury"},
+        {"id": "1.9.10.10", "text": "Sex or masturbation"},
+        {"id": "1.9.10.11", "text": "Other"}
+      ]
+    }
+  ]
+}
+
+interests_lifestyle_questions = {
+  "section": "1.10 Interests & Lifestyle",
+  "questions": [
+    {
+      "id": "1.10.1",
+      "variable_name": "interest_categories",
+      "text": "Which of these interest categories would you be interested in or want to include as part of your daily life?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.10.1.1", "text": "Games & Puzzles (board games, card games)"},
+        {"id": "1.10.1.2", "text": "Creative & Craft (drawing, painting, woodworking, knitting, stained glass)"},
+        {"id": "1.10.1.3", "text": "DIY & Mechanic (auto work, welding, home projects)"},
+        {"id": "1.10.1.4", "text": "Sports, Fitness & Outdoors (team sports, hiking, camping, gym workouts)"},
+        {"id": "1.10.1.5", "text": "Travel & Adventure (road trips, exploring)"},
+        {"id": "1.10.1.6", "text": "Learning & Intellectual (reading, languages, politics, collecting)"},
+        {"id": "1.10.1.7", "text": "Media & Entertainment (gaming, movies/TV, theater)"},
+        {"id": "1.10.1.8", "text": "Social & Community (clubs, meetups, events)"},
+        {"id": "1.10.1.9", "text": "Sexual Activities & Physical Pleasure (intimacy with partner, solo exploration, attending lifestyle events, erotic massage)"},
+        {"id": "1.10.1.10", "text": "Food & Culinary (cooking, baking, exploring restaurants)"},
+        {"id": "1.10.1.11", "text": "Home Improvement & Environment (gardening, organizing, décor, cleaning projects)"},
+        {"id": "1.10.1.12", "text": "Financial & Career Growth (budgeting, investing, skill-building)"},
+        {"id": "1.10.1.13", "text": "Volunteering & Giving Back (charity, activism, mentoring)"},
+        {"id": "1.10.1.14", "text": "Mind & Spiritual Growth (meditation, religion, philosophy, personal reflection)"},
+        {"id": "1.10.1.15", "text": "Animal & Pet Activities (training, care, play)"},
+        {"id": "1.10.1.16", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.10.2",
+      "variable_name": "current_interest_hours_per_week",
+      "text": "How many hours per week do you currently spend on these interests? (hours)",
+      "type": "number"
+    },
+    {
+      "id": "1.10.3",
+      "variable_name": "desired_interest_hours_per_week",
+      "text": "How many hours per week would you like to spend on these interests? (hours)",
+      "type": "number"
+    },
+    {
+      "id": "1.10.4",
+      "variable_name": "has_specific_projects",
+      "text": "Do you have any specific projects you want to work on?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.10.4.1", "text": "yes"},
+        {"id": "1.10.4.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.10.5",
+      "variable_name": "open_to_sprint_sessions",
+      "text": "Are you open to scheduling focused sprint sessions?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.10.5.1", "text": "yes"},
+        {"id": "1.10.5.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.10.6",
+      "variable_name": "desired_unscheduled_downtime_hours_per_day",
+      "text": "How much unscheduled downtime would you like each day? (0–5)",
+      "type": "number"
+    }
+  ]
+}
+
+diet_questions = {
+  "section": "1.4 Food, Diet, and Digestion",
+  "questions": [
+    {
+      "id": "1.4.1",
+      "variable_name": "diet_style",
+      "text": "Do you follow a specific diet or eating style?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.1.1", "text": "No"},
+        {"id": "1.4.1.2", "text": "Keto"},
+        {"id": "1.4.1.3", "text": "Paleo"},
+        {"id": "1.4.1.4", "text": "Mediterranean"},
+        {"id": "1.4.1.5", "text": "Vegetarian"},
+        {"id": "1.4.1.6", "text": "Vegan"},
+        {"id": "1.4.1.7", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.4.2",
+      "variable_name": "meals_at_home",
+      "text": "How many meals per day do you eat at home?",
+      "type": "number",
+      "range": {"min": 0, "max": 10}
+    },
+    {
+      "id": "1.4.3",
+      "variable_name": "meals_out",
+      "text": "How many meals per day do you eat out or order in?",
+      "type": "number",
+      "range": {"min": 0, "max": 10}
+    },
+    {
+      "id": "1.4.4",
+      "variable_name": "meal_duration",
+      "text": "How long does a typical meal take from prep to finish? (minutes)",
+      "type": "number"
+    },
+    {
+      "id": "1.4.5",
+      "variable_name": "use_eating_window",
+      "text": "Do you follow a specific eating window?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.5.1", "text": "No"},
+        {"id": "1.4.5.2", "text": "Yes"}
+      ]
+    },
+    {
+      "id": "1.4.5.2.1",
+      "variable_name": "eating_window_start",
+      "text": "If yes, what is the start time of your eating window? (hour + AM/PM)",
+      "type": "time"
+    },
+    {
+      "id": "1.4.5.2.2",
+      "variable_name": "eating_window_end",
+      "text": "If yes, what is the end time of your eating window? (hour + AM/PM)",
+      "type": "time"
+    },
+    {
+      "id": "1.4.6",
+      "variable_name": "meal_composition",
+      "text": "What’s your typical meal composition?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.6.1", "text": "High-protein"},
+        {"id": "1.4.6.2", "text": "High-carb"},
+        {"id": "1.4.6.3", "text": "High-fat"},
+        {"id": "1.4.6.4", "text": "Balanced"},
+        {"id": "1.4.6.5", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.4.7",
+      "variable_name": "food_allergies",
+      "text": "Do you have any food allergies or intolerances?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.4.7.1", "text": "Gluten"},
+        {"id": "1.4.7.2", "text": "Dairy"},
+        {"id": "1.4.7.3", "text": "Nuts"},
+        {"id": "1.4.7.4", "text": "Shellfish"},
+        {"id": "1.4.7.5", "text": "Soy"},
+        {"id": "1.4.7.6", "text": "Eggs"},
+        {"id": "1.4.7.7", "text": "Other"},
+        {"id": "1.4.7.8", "text": "None"}
+      ]
+    },
+    {
+      "id": "1.4.8",
+      "variable_name": "water_intake_cups",
+      "text": "How much water do you drink daily? (cups)",
+      "type": "number"
+    },
+    {
+      "id": "1.4.9",
+      "variable_name": "other_fluids",
+      "text": "Which of these other fluids do you consume regularly?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.4.9.1", "text": "Juice"},
+        {"id": "1.4.9.2", "text": "Soda"},
+        {"id": "1.4.9.3", "text": "Energy Drinks"},
+        {"id": "1.4.9.4", "text": "Coffee"},
+        {"id": "1.4.9.5", "text": "Tea"},
+        {"id": "1.4.9.6", "text": "Other"},
+        {"id": "1.4.9.7", "text": "None"}
+      ]
+    },
+    {
+      "id": "1.4.10",
+      "variable_name": "digestion_issues",
+      "text": "Do you experience any common digestion issues?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.4.10.1", "text": "Bloating"},
+        {"id": "1.4.10.2", "text": "Acid reflux"},
+        {"id": "1.4.10.3", "text": "Irregularity"},
+        {"id": "1.4.10.4", "text": "Gas"},
+        {"id": "1.4.10.5", "text": "None"}
+      ]
+    },
+    {
+      "id": "1.4.11",
+      "variable_name": "snacks_between_meals",
+      "text": "Do you snack between meals?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.11.1", "text": "Yes"},
+        {"id": "1.4.11.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.4.11.1.1",
+      "variable_name": "snacks_per_day",
+      "text": "If yes, how many snacks per day?",
+      "type": "number"
+    },
+    {
+      "id": "1.4.11.2",
+      "variable_name": "snack_types",
+      "text": "What types of snacks do you usually have? (select all that apply)",
+      "type": "multi-select",
+      "options": [
+          {"id": "1.4.11.2.1", "text": "Sweet", "value": "sweet"},
+          {"id": "1.4.11.2.2", "text": "Salty", "value": "salty"},
+          {"id": "1.4.11.2.3", "text": "Fruit", "value": "fruit"},
+          {"id": "1.4.11.2.4", "text": "Protein", "value": "protein"},
+          {"id": "1.4.11.2.5", "text": "Other", "value": "other"}
+      ]
+    },
+    {
+      "id": "1.4.12",
+      "variable_name": "foods_to_avoid",
+      "text": "Are there any foods you want to avoid or limit?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.4.12.1", "text": "Gluten"},
+        {"id": "1.4.12.2", "text": "Dairy"},
+        {"id": "1.4.12.3", "text": "Sugar"},
+        {"id": "1.4.12.4", "text": "Red meat"},
+        {"id": "1.4.12.5", "text": "Processed foods"},
+        {"id": "1.4.12.6", "text": "Other"},
+        {"id": "1.4.12.7", "text": "None"}
+      ]
+    },
+    {
+      "id": "1.4.13",
+      "variable_name": "hungry_within_2_hours",
+      "text": "Do you often feel hungry within 2 hours after a meal?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.13.1", "text": "Yes"},
+        {"id": "1.4.13.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.4.14",
+      "variable_name": "hours_between_meals",
+      "text": "How many hours typically pass between your meals?",
+      "type": "number"
+    },
+    {
+      "id": "1.4.15",
+      "variable_name": "meals_prep_in_advance",
+      "text": "How many meals per week do you cook or prep in advance?",
+      "type": "number",
+      "range": {"min": 0, "max": 14}
+    },
+    {
+      "id": "1.4.16",
+      "variable_name": "cooking_skill_level",
+      "text": "What is your cooking skill level?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.16.1", "text": "None (no cooking, relies on ready-made or takeout)"},
+        {"id": "1.4.16.2", "text": "Basic (can do simple recipes, reheating, boiling, frying)"},
+        {"id": "1.4.16.3", "text": "Intermediate (comfortable with various cooking methods and recipes)"},
+        {"id": "1.4.16.4", "text": "Advanced (experienced with complex dishes and meal prep)"}
+      ]
+    },
+    {
+      "id": "1.4.17",
+      "variable_name": "daily_meal_prep_time",
+      "text": "Average time available for meal prep per day (minutes)",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.17.1", "text": "0–15"},
+        {"id": "1.4.17.2", "text": "16–30"},
+        {"id": "1.4.17.3", "text": "31–60"},
+        {"id": "1.4.17.4", "text": "60+"}
+      ]
+    },
+    {
+      "id": "1.4.18",
+      "variable_name": "preferred_meal_prep_style",
+      "text": "Preferred meal prep style",
+      "type": "single-select",
+      "options": [
+        {"id": "1.4.18.1", "text": "Cook fresh each meal"},
+        {"id": "1.4.18.2", "text": "Batch cook/prep meals in advance"},
+        {"id": "1.4.18.3", "text": "Mix of fresh and batch prep"}
+      ]
+    },
+    {
+      "id": "1.4.19",
+      "variable_name": "kitchen_equipment_access",
+      "text": "Access to kitchen equipment (select all that apply)",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.4.19.1", "text": "Stove"},
+        {"id": "1.4.19.2", "text": "Oven"},
+        {"id": "1.4.19.3", "text": "Microwave"},
+        {"id": "1.4.19.4", "text": "Blender"},
+        {"id": "1.4.19.5", "text": "Slow cooker / Instant Pot"},
+        {"id": "1.4.19.6", "text": "Other (please specify)"}
+      ]
+    }
+  ]
+}
+
+sleep_questions = {
+  "section": "1.6 Health, Recovery, Sleep",
+  "questions": [
+    {
+      "id": "1.6.1",
+      "variable_name": "health_goals",
+      "text": "Which of these health goals apply to you?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.6.1.1", "text": "Weight loss / fat reduction"},
+        {"id": "1.6.1.2", "text": "Muscle gain / strength building"},
+        {"id": "1.6.1.3", "text": "Improved energy / reduced fatigue"},
+        {"id": "1.6.1.4", "text": "Better sleep quality"},
+        {"id": "1.6.1.5", "text": "Stress management / anxiety reduction"},
+        {"id": "1.6.1.6", "text": "Cardiovascular endurance"},
+        {"id": "1.6.1.7", "text": "Flexibility / joint mobility"},
+        {"id": "1.6.1.8", "text": "Healthy eating / nutrition"},
+        {"id": "1.6.1.9", "text": "Digestive health / gut comfort"},
+        {"id": "1.6.1.10", "text": "Long-term health maintenance / disease prevention"},
+        {"id": "1.6.1.11", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.6.2",
+      "variable_name": "usual_sleep_hours",
+      "text": "How many hours of sleep do you usually get per night?",
+      "type": "number",
+      "range": {"min": 0, "max": 12}
+    },
+    {
+      "id": "1.6.3",
+      "variable_name": "trouble_sleeping",
+      "text": "Do you have trouble falling or staying asleep?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.6.3.1", "text": "Yes"},
+        {"id": "1.6.3.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.6.4",
+      "variable_name": "use_sleep_aids",
+      "text": "Do you use melatonin or other sleep aids?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.6.4.1", "text": "Yes"},
+        {"id": "1.6.4.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.6.5",
+      "variable_name": "earliest_wake_time",
+      "text": "What is the earliest you are required to wake up?",
+      "type": "time"
+    },
+    {
+      "id": "1.6.6",
+      "variable_name": "latest_bedtime",
+      "text": "What is the latest you are required to go to sleep?",
+      "type": "time"
+    },
+    {
+      "id": "1.6.9",
+      "variable_name": "feel_rested_on_waking",
+      "text": "Do you feel rested when you wake up?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.6.9.1", "text": "Yes"},
+        {"id": "1.6.9.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.6.10",
+      "variable_name": "use_screens_before_bed",
+      "text": "Do you use screens within 30 minutes before bed?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.6.10.1", "text": "Yes"},
+        {"id": "1.6.10.2", "text": "No"}
+      ]
+    }
+  ]
+}
+
+motivation_mindset_questions = {
+  "section": "1.11 Motivation & Mindset",
+  "questions": [
+    {
+      "id": "1.11.1",
+      "variable_name": "primary_motivation",
+      "text": "What are your top motivations for improving your well-being?",
+      "type": "multi-select",
+      "max_selections": 2,
+      "options": [
+        {"id": "1.11.1.1", "text": "Have more energy"},
+        {"id": "1.11.1.2", "text": "Look better physically"},
+        {"id": "1.11.1.3", "text": "Improve sexual performance"},
+        {"id": "1.11.1.4", "text": "Improve mental focus"},
+        {"id": "1.11.1.5", "text": "Build consistency or discipline"},
+        {"id": "1.11.1.6", "text": "Feel healthier overall"},
+        {"id": "1.11.1.7", "text": "Reduce stress or anxiety"},
+        {"id": "1.11.1.8", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.11.2",
+      "variable_name": "commitment_level",
+      "text": "How committed do you feel to this plan for the next 4 weeks?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.11.2.1", "text": "Just curious"},
+        {"id": "1.11.2.2", "text": "I'll try, but not strict"},
+        {"id": "1.11.2.3", "text": "I'll stick with it if it feels good"},
+        {"id": "1.11.2.4", "text": "I'm serious"},
+        {"id": "1.11.2.5", "text": "I'm all in—no excuses"}
+      ]
+    },
+    {
+      "id": "1.11.3",
+      "variable_name": "routine_disruptors",
+      "text": "Which of these are most likely to disrupt your routines?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.11.3.1", "text": "Boredom"},
+        {"id": "1.11.3.2", "text": "Travel or schedule changes"},
+        {"id": "1.11.3.3", "text": "Work or school stress"},
+        {"id": "1.11.3.4", "text": "Low motivation or energy"},
+        {"id": "1.11.3.5", "text": "Other people’s schedules"},
+        {"id": "1.11.3.6", "text": "Lack of flexibility"},
+        {"id": "1.11.3.7", "text": "Forgetting or losing momentum"},
+        {"id": "1.11.3.8", "text": "All-or-nothing thinking"},
+        {"id": "1.11.3.9", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.11.4",
+      "variable_name": "willing_to_give_up",
+      "text": "Which things are you willing to reduce or give up for better results?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.11.4.1", "text": "Screen time or social media"},
+        {"id": "1.11.4.2", "text": "Alcohol"},
+        {"id": "1.11.4.3", "text": "Tobacco or vaping"},
+        {"id": "1.11.4.4", "text": "Marijuana or recreational drugs"},
+        {"id": "1.11.4.5", "text": "Sex or solo play"},
+        {"id": "1.11.4.6", "text": "Junk food or takeout"},
+        {"id": "1.11.4.7", "text": "Sugar or sweets"},
+        {"id": "1.11.4.8", "text": "Sleeping in"},
+        {"id": "1.11.4.9", "text": "Passive downtime"},
+        {"id": "1.11.4.10", "text": "Impulse spending"},
+        {"id": "1.11.4.11", "text": "Evening entertainment (TV, games)"},
+        {"id": "1.11.4.12", "text": "Hobbies or creative time"},
+        {"id": "1.11.4.13", "text": "Spontaneity in schedule"},
+        {"id": "1.11.4.14", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.11.5",
+      "variable_name": "not_willing_to_give_up",
+      "text": "Which things are you NOT willing to give up, even for faster progress?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.11.5.1", "text": "Time with partner or family"},
+        {"id": "1.11.5.2", "text": "Sex or solo play"},
+        {"id": "1.11.5.3", "text": "Caffeine"},
+        {"id": "1.11.5.4", "text": "Recreational substances (weed, etc.)"},
+        {"id": "1.11.5.5", "text": "Alcohol"},
+        {"id": "1.11.5.6", "text": "Smoking or vaping"},
+        {"id": "1.11.5.7", "text": "Gaming or TV"},
+        {"id": "1.11.5.8", "text": "Reading or quiet time"},
+        {"id": "1.11.5.9", "text": "Hobbies or creative outlets"},
+        {"id": "1.11.5.10", "text": "Comfort foods"},
+        {"id": "1.11.5.11", "text": "Freedom to sleep in occasionally"},
+        {"id": "1.11.5.12", "text": "Ability to skip workouts if tired"},
+        {"id": "1.11.5.13", "text": "Flexibility or unstructured time"},
+        {"id": "1.11.5.14", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.11.6",
+      "variable_name": "early_signs_of_success",
+      "text": "What will tell you this plan is starting to work?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.11.6.1", "text": "Better sleep"},
+        {"id": "1.11.6.2", "text": "Compliments from others"},
+        {"id": "1.11.6.3", "text": "Improved focus or mood"},
+        {"id": "1.11.6.4", "text": "Higher sex drive or performance"},
+        {"id": "1.11.6.5", "text": "Stronger workouts"},
+        {"id": "1.11.6.6", "text": "More self-control"},
+        {"id": "1.11.6.7", "text": "Clothes fitting better"},
+        {"id": "1.11.6.8", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.11.7",
+      "variable_name": "desired_end_feelings",
+      "text": "How do you want to feel at the end of this plan?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.11.7.1", "text": "Proud"},
+        {"id": "1.11.7.2", "text": "Energized"},
+        {"id": "1.11.7.3", "text": "Confident"},
+        {"id": "1.11.7.4", "text": "Stronger or fitter"},
+        {"id": "1.11.7.5", "text": "More attractive"},
+        {"id": "1.11.7.6", "text": "Focused"},
+        {"id": "1.11.7.7", "text": "Balanced"},
+        {"id": "1.11.7.8", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.11.8",
+      "variable_name": "motivational_style",
+      "text": "What type of motivation works best for you?",
+      "type": "multi-select",
+      "max_selections": 2,
+      "options": [
+        {"id": "1.11.8.1", "text": "Encouragement and praise"},
+        {"id": "1.11.8.2", "text": "Competitive challenge"},
+        {"id": "1.11.8.3", "text": "Clear structure and targets"},
+        {"id": "1.11.8.4", "text": "Accountability from others"},
+        {"id": "1.11.8.5", "text": "Internal motivation only"},
+        {"id": "1.11.8.6", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.11.9",
+      "variable_name": "accountability_preference",
+      "text": "How do you feel about external accountability?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.11.9.1", "text": "I want reminders and check-ins"},
+        {"id": "1.11.9.2", "text": "I prefer solo tracking"},
+        {"id": "1.11.9.3", "text": "Light nudges only"},
+        {"id": "1.11.9.4", "text": "I find accountability intrusive"},
+        {"id": "1.11.9.5", "text": "Other"}
+      ]
+    }
+  ]
+}
+
+plan_supporting_questions = {
+  "section": "1.12 Plan Tailoring Extras",
+  "questions": [
+    {
+      "id": "1.12.1",
+      "variable_name": "stress_peak_time",
+      "text": "What part of the day do you usually feel the most stress?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.12.1.1", "text": "Morning"},
+        {"id": "1.12.1.2", "text": "Midday"},
+        {"id": "1.12.1.3", "text": "Afternoon"},
+        {"id": "1.12.1.4", "text": "Evening"},
+        {"id": "1.12.1.5", "text": "Late night"},
+        {"id": "1.12.1.6", "text": "No specific time"}
+      ]
+    },
+    {
+      "id": "1.12.2",
+      "variable_name": "meal_prep_willingness",
+      "text": "Would you be willing to spend more time prepping meals if it improved results?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.12.2.1", "text": "Yes"},
+        {"id": "1.12.2.2", "text": "Maybe a little more"},
+        {"id": "1.12.2.3", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.12.3",
+      "variable_name": "substance_quit_history",
+      "text": "Have you tried quitting tobacco, alcohol, or other substances before?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.12.3.1", "text": "Yes, and it worked well"},
+        {"id": "1.12.3.2", "text": "Yes, but it didn’t last"},
+        {"id": "1.12.3.3", "text": "Yes, multiple times"},
+        {"id": "1.12.3.4", "text": "No, this is my first real attempt"},
+        {"id": "1.12.3.5", "text": "Not trying to quit anything"}
+      ]
+    },
+    {
+      "id": "1.12.4",
+      "variable_name": "frequent_soreness",
+      "text": "Do you often feel sore, tight, or stiff during the day?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.12.4.1", "text": "Yes, most days"},
+        {"id": "1.12.4.2", "text": "Sometimes"},
+        {"id": "1.12.4.3", "text": "Rarely or never"}
+      ]
+    },
+    {
+      "id": "1.12.5",
+      "variable_name": "interest_in_recovery",
+      "text": "Would you like to include light mobility or recovery sessions in your plan?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.12.5.1", "text": "Yes"},
+        {"id": "1.12.5.2", "text": "Maybe"},
+        {"id": "1.12.5.3", "text": "No"}
+      ]
+    }
+  ]
+}
+
+all_questions = {
+  "identity":identity_questions,
+  "daily":daily_rhythm_questions,
+  "substance":substances_questions,
+  "meds":medications_questions,
+  "fitness":fitness_questions,
+  "sex" :sexual_wellness_questions,
+  "stress" : stress_work_tech_questions,
+  "interest" : interests_lifestyle_questions,
+  "diet": diet_questions,
+  "sleep": sleep_questions,
+  "motivation": motivation_mindset_questions,
+  "support": plan_supporting_questions
+}
+

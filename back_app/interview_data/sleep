@@ -1,0 +1,174 @@
+from typing import List, Tuple
+
+sleep_questions = {
+  "section": "1.6 Health, Recovery, Sleep",
+  "questions": [
+    {
+      "id": "1.6.1",
+      "text": "Which of these health goals apply to you?",
+      "type": "multi-select",
+      "options": [
+        {"id": "1.6.1.1", "text": "Weight loss / fat reduction"},
+        {"id": "1.6.1.2", "text": "Muscle gain / strength building"},
+        {"id": "1.6.1.3", "text": "Improved energy / reduced fatigue"},
+        {"id": "1.6.1.4", "text": "Better sleep quality"},
+        {"id": "1.6.1.5", "text": "Stress management / anxiety reduction"},
+        {"id": "1.6.1.6", "text": "Cardiovascular endurance"},
+        {"id": "1.6.1.7", "text": "Flexibility / joint mobility"},
+        {"id": "1.6.1.8", "text": "Healthy eating / nutrition"},
+        {"id": "1.6.1.9", "text": "Digestive health / gut comfort"},
+        {"id": "1.6.1.10", "text": "Long-term health maintenance / disease prevention"},
+        {"id": "1.6.1.11", "text": "Other"}
+      ]
+    },
+    {
+      "id": "1.6.2",
+      "text": "How many hours of sleep do you usually get per night?",
+      "type": "number",
+      "range": {"min": 0, "max": 12}
+    },
+    {
+      "id": "1.6.3",
+      "text": "Do you have trouble falling or staying asleep?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.6.3.1", "text": "Yes"},
+        {"id": "1.6.3.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.6.4",
+      "text": "Do you use melatonin or other sleep aids?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.6.4.1", "text": "Yes"},
+        {"id": "1.6.4.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.6.5",
+      "text": "What is the earliest you are required to wake up?",
+      "type": "time"
+    },
+    {
+      "id": "1.6.6",
+      "text": "What is the latest you are required to go to sleep?",
+      "type": "time"
+    },
+    {
+      "id": "1.6.9",
+      "text": "Do you feel rested when you wake up?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.6.9.1", "text": "Yes"},
+        {"id": "1.6.9.2", "text": "No"}
+      ]
+    },
+    {
+      "id": "1.6.10",
+      "text": "Do you use screens within 30 minutes before bed?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.6.10.1", "text": "Yes"},
+        {"id": "1.6.10.2", "text": "No"}
+      ]
+    }
+  ]
+}
+
+def time_str_to_slot(time_str: str) -> int:
+    """Convert 'HH:MM' 24h string to 5-min slot integer (0–287)."""
+    h, m = map(int, time_str.split(':'))
+    return h * 12 + m // 5
+
+def slot_to_time_str(slot: int) -> str:
+    """Convert 5-min slot integer back to 'HH:MM' string."""
+    h = slot // 12
+    m = (slot % 12) * 5
+    return f"{h:02d}:{m:02d}"
+
+def calculate_target_bedtime_slot(earliest_wake_str: str, typical_sleep_hours: float) -> int:
+    wake_slot = time_str_to_slot(earliest_wake_str)
+    sleep_slots = int(typical_sleep_hours * 12)
+    bedtime_slot = wake_slot - sleep_slots
+    if bedtime_slot < 0:
+        bedtime_slot += 288  # wrap around midnight
+    return bedtime_slot
+
+def adjust_bedtime_for_sleep_issues(
+    bedtime_slot: int,
+    trouble_sleeping: bool,
+    uses_sleep_aids: bool,
+    caffeine_intake_per_day: int,
+    caffeine_last_intake_slot: int,
+    tobacco_use: bool,
+    alcohol_use: bool,
+    cravings_evening: bool
+) -> int:
+    """
+    Adjust bedtime earlier if trouble sleeping and no aids.
+    Also consider caffeine/alcohol/tobacco and evening cravings delaying sleep.
+    """
+    adjusted_slot = bedtime_slot
+    
+    # Shift earlier 15 minutes if trouble sleeping and no aids
+    if trouble_sleeping and not uses_sleep_aids:
+        adjusted_slot -= 3  # 3 slots = 15 min
+
+    # If caffeine consumed late (within 6 hours of bedtime), shift bedtime later by 15 minutes
+    if caffeine_intake_per_day > 0:
+        diff = adjusted_slot - caffeine_last_intake_slot
+        if 0 <= diff < 72:  # 6 hours = 72 slots
+            adjusted_slot += 3  # delay bedtime 15 min
+
+    # If evening cravings present, possibly delay bedtime 15 min
+    if cravings_evening:
+        adjusted_slot += 3
+
+    # Tobacco and alcohol can disrupt sleep, but exact timing unknown
+    # Could add similar logic if timing info available
+
+    # Normalize to 0–287
+    adjusted_slot %= 288
+    return adjusted_slot
+
+def validate_sleep_schedule(bedtime_slot: int, latest_bedtime_str: str) -> Tuple[bool, int]:
+    latest_slot = time_str_to_slot(latest_bedtime_str)
+    if bedtime_slot > latest_slot:
+        return False, latest_slot
+    return True, bedtime_slot
+
+def generate_sleep_routine_recommendations(
+    trouble_sleeping: bool,
+    uses_sleep_aids: bool,
+    caffeine_intake_per_day: int,
+    tobacco_use: bool,
+    alcohol_use: bool
+) -> List[str]:
+    tips = []
+    if trouble_sleeping:
+        tips.append("Establish a calming pre-sleep routine.")
+        tips.append("Avoid screens 30 minutes before bedtime.")
+        if not uses_sleep_aids:
+            tips.append("Consider relaxation techniques like meditation or deep breathing.")
+    else:
+        tips.append("Maintain consistent sleep and wake times.")
+    
+    if caffeine_intake_per_day > 0:
+        tips.append("Limit caffeine intake, especially in the afternoon and evening.")
+    if tobacco_use:
+        tips.append("Avoid tobacco use close to bedtime.")
+    if alcohol_use:
+        tips.append("Limit alcohol consumption near bedtime for better sleep quality.")
+    
+    return tips
+
+def summarize_sleep_plan(bedtime_slot: int, wake_time_str: str, duration_hours: float, recommendations: List[str]) -> str:
+    bedtime_str = slot_to_time_str(bedtime_slot)
+    summary = (f"Sleep Plan:\n- Target bedtime: {bedtime_str}\n- Wake time: {wake_time_str}\n"
+               f"- Target duration: {duration_hours} hours\n- Recommendations:\n")
+    for tip in recommendations:
+        summary += f"  • {tip}\n"
+    return summary
+
+
