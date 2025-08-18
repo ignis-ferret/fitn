@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
 
   mongo:
-    image: mongo:6-jammy       
+    image: mongo:8.0       
     container_name: fitn-mongo
     restart: unless-stopped
     volumes:
