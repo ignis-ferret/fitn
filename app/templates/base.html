@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{% block title %}Fitn{% endblock %}</title>
+
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+
+    <!-- Page-specific CSS -->
+    {% block styles %}{% endblock %}
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="brand">Fitn</a>
+        <nav class="nav">
+          {% if request.state.user %}
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/rewards/" class="nav-link">Rewards</a>
+            <a href="/intake" class="nav-link">Intake</a>
+            <form method="post" action="/auth/signout" class="inline">
+              <button class="btn tiny">Sign out</button>
+            </form>
+          {% else %}
+            <a href="/auth/signin" class="nav-link">Sign in</a>
+            <a href="/auth/signup" class="nav-link btn small primary">Create account</a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div class="container muted">© {{  now().year if now else ''  }} Fitn</div>
+    </footer>
+
+    <!-- Shared JS -->
+    <script defer src="{{ url_for('static', path='js/base.js') }}"></script>
+
+    <!-- Page-specific JS -->
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

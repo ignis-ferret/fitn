@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Fitn Planner{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">{% endblock %}
+
+{% block content %}
+  <div class="wrap">
+    <section class="hero card">
+      <h1>Welcome to your Planner</h1>
+      <p>Build a personalized plan across four pillars: Sleep, Diet/Meals, Workouts/Activity, and Rewards.</p>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Sleep</h2>
+          <ul>
+            <li>28-day schedule</li><li>Bed/wake targets</li><li>Wind-down actions</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Diet / Meals</h2>
+          <ul>
+            <li>Daily calories & protein</li><li>Meal timing & snacks</li><li>Restrictions honored</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Workouts / Activity</h2>
+          <ul>
+            <li>Weekly training blocks</li><li>Progression & deloads</li><li>NEAT & mobility goals</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Rewards</h2>
+          <ul>
+            <li>Motivating choices</li><li>Tiered selection flow</li><li>Personalized scenarios</li>
+          </ul>
+        </div>
+      </div>
+
+      {% if user %}
+        <p>Welcome{{ " " + user.get("name") if user.get("name") else "" }}.</p>
+        <div class="cta">
+          <a class="btn primary" href="/rewards/">Continue: Rewards</a>
+          <a class="btn ghost" href="/deva/">Dev tools</a>
+        </div>
+      {% else %}
+        <div class="cta">
+          <a class="btn ghost" href="/auth/signin">Sign in</a>
+          <a class="btn primary" href="/auth/signup">Create account</a>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

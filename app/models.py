@@ -1,10 +1,8 @@
-# =========================
-# 1) models.py (Pydantic)
-# =========================
-from pydantic import BaseModel, Field, validator
-from pydantic import BaseModel, Field
+# app/models.py
 from typing import Optional, List, Literal, Dict, Any
+from pydantic import BaseModel, Field, validator
 
+# --- Rewards/Pick Model Tree ---
 class Variation(BaseModel):
     code: str
     example: str
@@ -31,20 +29,22 @@ class SelectionPayload(BaseModel):
     user_id: str = Field(..., min_length=1)
     level1_codes: List[str] = []
     level2_codes: List[str] = []
-    # one chosen variation per selected level3 item
-    level3_choices: List[Dict[str, str]] = []  # [{ "item_code": "3.1.1.1", "variant_code": "3.1.1.1.2" }, ...]
+    # [{ "item_code": "...", "variant_code": "..." }]
+    level3_choices: List[Dict[str, str]] = []
 
     @validator("level1_codes")
     def max3_level1(cls, v):
-        if len(v) > 3: raise ValueError("Up to 3 selections in Level 1")
+        if len(v) > 3:
+            raise ValueError("Up to 3 selections in Level 1")
         return v
 
     @validator("level2_codes")
     def max3_level2(cls, v):
-        if len(v) > 3: raise ValueError("Up to 3 selections in Level 2")
+        if len(v) > 3:
+            raise ValueError("Up to 3 selections in Level 2")
         return v
 
-
+# --- Intake Model ---
 class IntakeOption(BaseModel):
     id: str
     text: str
@@ -58,9 +58,7 @@ class IntakeConditional(BaseModel):
     variable_name: str
     value: str
 
-IntakeType = Literal[
-    "single-select","multi-select","number","time","time_24h","boolean"
-]
+IntakeType = Literal["single-select","multi-select","number","time","time_24h","boolean"]
 
 class IntakeQuestion(BaseModel):
     id: str

@@ -1,0 +1,17 @@
+:root { --bg:#fafafa; --card:#fff; --text:#111; --muted:#666; --line:#eee; --accent:#111; }
+*{ box-sizing:border-box; }
+body{ margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); }
+.wrap{ max-width:900px; margin:0 auto; padding:16px; }
+.hero{ background:var(--card); border-radius:14px; padding:18px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+h1{ margin:0 0 8px; font-size:22px; }
+p{ margin:6px 0; color:var(--muted); }
+.cta{ display:flex; gap:10px; margin-top:14px; }
+.btn{ flex:1; padding:14px; border:none; border-radius:12px; font-weight:700; text-align:center; text-decoration:none; }
+.primary{ background:var(--accent); color:#fff; }
+.ghost{ background:#e9e9e9; color:#111; }
+.grid{ display:grid; grid-template-columns: 1fr; gap:12px; margin-top:14px; }
+.card{ background:var(--card); border-radius:12px; padding:14px; border:1px solid var(--line); }
+.card h2{ margin:0 0 6px; font-size:16px; }
+.card ul{ margin:6px 0 0 18px; color:var(--muted); }
+@media (min-width:720px){ .grid{ grid-template-columns:repeat(2,1fr);} }
+@media (min-width:960px){ .grid{ grid-template-columns:repeat(4,1fr);} }

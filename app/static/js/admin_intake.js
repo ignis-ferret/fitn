@@ -1,156 +1,3 @@
-<!doctype html>
-<html lang="en">
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Admin · Intake Questions</title>
-<style>
-  :root { --bg:#fafafa; --card:#fff; --text:#111; --muted:#666; --line:#eee; --accent:#111; }
-  *{ box-sizing:border-box; }
-  body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--text); }
-  .wrap{ max-width:1100px; margin:0 auto; padding:16px; }
-  h1{ margin:0 0 10px; font-size:20px; }
-
-  .bar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:12px 0; }
-  .bar input, .bar select{ padding:10px; border:1px solid var(--line); border-radius:10px; font-size:16px; background:#fff; }
-  .btn{ padding:10px 12px; border:none; border-radius:10px; background:#111; color:#fff; font-weight:700; cursor:pointer; }
-  .btn.ghost{ background:#e9e9e9; color:#111; }
-  .btn.danger{ background:#b94a48; }
-  .btn.small{ padding:6px 8px; border-radius:7px; font-size:12px; }
-  .muted{ color:var(--muted); }
-  .tag{ font-size:12px; color:#555; background:#f2f2f2; border:1px solid #e5e5e5; border-radius:8px; padding:2px 6px; }
-
-  .card{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:8px 0; }
-  .section-card > .head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .qcard{ border:1px dashed #e7e7e7; border-radius:10px; padding:10px; margin:8px 0; background:#fff; }
-  .qhead{ display:flex; align-items:center; gap:8px; justify-content:space-between; }
-  .qtitle{ display:flex; align-items:center; gap:10px; min-width:0; }
-  .idpill{ font:600 12px/1 system-ui; background:#efefef; border-radius:999px; padding:3px 8px; color:#333; white-space:nowrap; }
-  .drag{ cursor:grab; user-select:none; font-size:18px; opacity:.6; }
-  .collapse-btn{ background:transparent; border:none; font-weight:700; cursor:pointer; padding:6px 8px; }
-  .grow{ flex:1; min-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .pill{ font-size:12px; color:#333; background:#eee; border-radius:999px; padding:3px 8px; white-space:nowrap; }
-
-  .qbody{ display:none; padding-top:8px; border-top:1px dashed #eee; margin-top:8px; }
-  .row{ display:flex; gap:10px; flex-wrap:wrap; }
-  .row > *{ flex:1; min-width:200px; }
-  label{ display:block; font-size:12px; color:#555; margin:6px 0 4px; }
-  input[type="text"], input[type="number"], select, textarea{
-    width:100%; padding:10px; border:1px solid #e5e5e5; border-radius:8px; font-size:14px; background:#fff;
-  }
-  textarea{ min-height:80px; }
-
-  .opts-head{ display:flex; justify-content:space-between; align-items:center; }
-  .opt{ display:flex; gap:6px; margin:6px 0; }
-  .opt input{ flex:1; }
-  .handle-col{ display:flex; align-items:center; gap:6px; }
-  .updown{ display:flex; gap:6px; }
-  .drop-hint{ border:2px dashed #bbb; border-radius:10px; padding:10px; text-align:center; color:#666; display:none; }
-
-  .save-order-bar{ display:none; justify-content:flex-end; gap:8px; margin-top:8px; }
-  .dirty .save-order-bar{ display:flex; }
-
-  /* Create dialog */
-  .create-wrap{ display:none; }
-  .grid{ display:grid; grid-template-columns:1fr; gap:10px; }
-  @media(min-width:1000px){ .grid{ grid-template-columns:1fr 2fr; } }
-
-  .hidden{ display:none !important; }
-</style>
-<body>
-<div class="wrap">
-  <h1>Intake Questions</h1>
-
-  <!-- Toolbar -->
-  <div class="bar">
-    <input id="search" placeholder="Search id / variable / text…" />
-    <select id="sectionFilter">
-      <option value="">All sections</option>
-    </select>
-    <button class="btn ghost" id="expandAll">Expand all</button>
-    <button class="btn ghost" id="collapseAll">Collapse all</button>
-    <button class="btn" id="reloadBtn">Reload</button>
-    <button class="btn" id="toggleCreate">New Question</button>
-  </div>
-
-  <!-- Create new -->
-  <div class="card create-wrap" id="createForm">
-    <div class="grid">
-      <div class="card">
-        <h3 style="margin:0 0 8px;">Meta</h3>
-        <label>Section</label>
-        <select id="c_section"></select>
-        <div class="muted" id="c_nextid_hint" style="margin:6px 0 8px;">Next ID will be computed…</div>
-        <label>Variable name</label>
-        <input id="c_var" placeholder="e.g., gender" />
-        <label>Type</label>
-        <select id="c_type">
-          <option>single-select</option>
-          <option>multi-select</option>
-          <option>number</option>
-          <option>time</option>
-          <option>time_24h</option>
-          <option>boolean</option>
-        </select>
-        <div id="c_numwrap" class="hidden">
-          <div class="row">
-            <div>
-              <label>Range min</label>
-              <input id="c_rmin" type="number" />
-            </div>
-            <div>
-              <label>Range max</label>
-              <input id="c_rmax" type="number" />
-            </div>
-          </div>
-        </div>
-        <div id="c_multisel_wrap" class="hidden">
-          <label>Max selections</label>
-          <input id="c_maxsel" type="number" min="1" />
-        </div>
-        <label>Optional?</label>
-        <select id="c_optional">
-          <option value="">(no)</option>
-          <option value="true">true</option>
-        </select>
-        <h4 style="margin:10px 0 4px;">Condition (optional)</h4>
-        <div class="row">
-          <div>
-            <label>Conditional variable</label>
-            <input id="c_cvar" placeholder="variable_name" />
-          </div>
-          <div>
-            <label>Value</label>
-            <input id="c_cval" placeholder="value" />
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3 style="margin:0 0 8px;">Content</h3>
-        <label>Question text</label>
-        <textarea id="c_text" rows="6" placeholder="Question text"></textarea>
-
-        <div id="c_opts_wrap" class="hidden" style="margin-top:8px;">
-          <div class="opts-head">
-            <strong>Options</strong>
-            <button class="btn ghost small" type="button" onclick="addCOpt()">Add</button>
-          </div>
-          <div id="c_opts"></div>
-        </div>
-
-        <div style="margin-top:10px;">
-          <button class="btn" onclick="createQ()">Create</button>
-          <button class="btn ghost" onclick="toggleCreate()">Cancel</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sections render here -->
-  <div id="sections"></div>
-</div>
-
-<script>
 let raw = {};               // { section: [questions] } as returned
 let filtered = {};          // after search/filter
 let dirtySections = new Set();
@@ -446,6 +293,7 @@ function qCard(section, q){
   applyTypeVisibility();
 
   // collapse
+  const expandBtn = right.querySelector('.collapse-btn');
   expandBtn.onclick = () => {
     const open = body.style.display === 'block';
     body.style.display = open ? 'none' : 'block';
@@ -563,65 +411,24 @@ function applyCreateTypeVisibility(){
   document.getElementById('c_multisel_wrap').classList.toggle('hidden', t!=='multi-select');
   document.getElementById('c_numwrap').classList.toggle('hidden', t!=='number');
 }
-document.getElementById('c_type').addEventListener('change', applyCreateTypeVisibility);
-document.getElementById('c_section').addEventListener('change', updateNextIdHint);
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('c_type').addEventListener('change', applyCreateTypeVisibility);
+  document.getElementById('c_section').addEventListener('change', updateNextIdHint);
 
-async function createQ(){
-  const section = document.getElementById('c_section').value;
-  const id = computeNextIdForSection(section);
-  const variable = document.getElementById('c_var').value.trim();
-  const type = document.getElementById('c_type').value;
-  const text = document.getElementById('c_text').value.trim();
-  const rmin = document.getElementById('c_rmin').value;
-  const rmax = document.getElementById('c_rmax').value;
-  const maxsel = document.getElementById('c_maxsel').value;
-  const optionalSel = document.getElementById('c_optional').value;
-  const cvar = document.getElementById('c_cvar').value.trim();
-  const cval = document.getElementById('c_cval').value.trim();
-  const opts = [...document.getElementById('c_opts').querySelectorAll('.opt')].map(row=>{
-    const oi = row.querySelector('.oid').value.trim();
-    const ot = row.querySelector('.otext').value.trim();
-    const ov = row.querySelector('.oval').value.trim();
-    const o={id:oi,text:ot}; if(ov) o.value=ov; return o;
-  }).filter(o=>o.id && o.text);
+  /* ---------- UI wires ---------- */
+  document.getElementById('reloadBtn').onclick = reload;
+  document.getElementById('toggleCreate').onclick = toggleCreate;
+  document.getElementById('search').addEventListener('input', applyFilterAndRender);
+  document.getElementById('sectionFilter').addEventListener('change', applyFilterAndRender);
+  document.getElementById('expandAll').onclick = () => {
+    document.querySelectorAll('.qbody').forEach(b=>{ b.style.display='block'; });
+    document.querySelectorAll('.collapse-btn').forEach(b=> b.textContent='▾');
+  };
+  document.getElementById('collapseAll').onclick = () => {
+    document.querySelectorAll('.qbody').forEach(b=>{ b.style.display='none'; });
+    document.querySelectorAll('.collapse-btn').forEach(b=> b.textContent='▸');
+  };
 
-  if(!section || !id || !variable || !type || !text){ alert('Missing required fields'); return; }
-
-  const q = { id, section, variable_name: variable, type, text };
-  if (opts.length && (type==='single-select'||type==='multi-select')) q.options = opts;
-  if (type==='number' && (rmin || rmax)) q.range = { min: rmin?Number(rmin):null, max: rmax?Number(rmax):null };
-  if (type==='multi-select' && maxsel) q.max_selections = Number(maxsel);
-  if (optionalSel === 'true') q.optional = true;
-  if (cvar && cval) q.conditional_on = { variable_name:cvar, value:cval };
-
-  const res = await fetch('/api/admin/intake', {
-    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(q)
-  });
-  if(res.ok){
-    toggleCreate();
-    reload();
-  }else{
-    const t = await res.text();
-    alert('Create failed: ' + t);
-  }
-}
-
-/* ---------- UI wires ---------- */
-document.getElementById('reloadBtn').onclick = reload;
-document.getElementById('toggleCreate').onclick = toggleCreate;
-document.getElementById('search').addEventListener('input', applyFilterAndRender);
-document.getElementById('sectionFilter').addEventListener('change', applyFilterAndRender);
-document.getElementById('expandAll').onclick = () => {
-  document.querySelectorAll('.qbody').forEach(b=>{ b.style.display='block'; });
-  document.querySelectorAll('.collapse-btn').forEach(b=> b.textContent='▾');
-};
-document.getElementById('collapseAll').onclick = () => {
-  document.querySelectorAll('.qbody').forEach(b=>{ b.style.display='none'; });
-  document.querySelectorAll('.collapse-btn').forEach(b=> b.textContent='▸');
-};
-
-/* ---------- Go ---------- */
-reload();
-</script>
-</body>
-</html>
+  /* ---------- Go ---------- */
+  reload();
+});
