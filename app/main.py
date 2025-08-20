@@ -1,6 +1,7 @@
 # app/main.py
 from pathlib import Path  # ✅ add this
 from fastapi import FastAPI, Request
+from .routers import health as health_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -20,6 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 
 app = FastAPI()
+
+app.include_router(health_router.router)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # CORS
