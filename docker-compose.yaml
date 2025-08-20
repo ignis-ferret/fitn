@@ -1,37 +1,30 @@
 services:
-  backend:
-    build: ./back_app
-    image: fitn-backend:latest
-    container_name: fitn-backend
-    env_file: [.env]
-    ports: ["8002:8002"]
-    depends_on: [mongo]
-    networks: [fitn_net]
-    restart: unless-stopped
+  api:
+    build: ./app
+    env_file: .env
+    depends_on:
+      - mongo
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8002/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: ["internal"]
 
   mongo:
-    image: mongo:8.0       
-    container_name: fitn-mongo
-    restart: unless-stopped
-    volumes:
-      - mongo_data:/data/db
-    networks: [fitn_net]
+    image: mongo:7
+    volumes: ["mongo-data:/data/db"]
+    networks: ["internal"]
 
   nginx:
-    image: nginx:1.27-alpine 
-    container_name: fitn-nginx
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./front_app:/usr/share/nginx/html:ro
-      - ./back_app/static:/var/www/static:ro
-    ports: ["81:81"]
-    depends_on: [backend]
-    networks: [fitn_net]
-    restart: unless-stopped
+    build: ./nginx
+    ports: ["80:80"]
+    depends_on: ["api"]
+    networks: ["internal", "public"]
 
 volumes:
-  mongo_data:
+  mongo-data:
 
 networks:
-  fitn_net:
-    driver: bridge
+  internal:
+  public:
