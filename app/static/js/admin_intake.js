@@ -2,11 +2,22 @@ let raw = {};               // { section: [questions] } as returned
 let filtered = {};          // after search/filter
 let dirtySections = new Set();
 
-function el(tag, attrs={}, children=[]) {
+function el(tag, attrs = {}, children = []) {
+  // Allow el(tag, [children...]) or el(tag, child) or el(tag, null, children)
+  if (
+    Array.isArray(attrs) ||
+    attrs instanceof Node ||
+    typeof attrs === 'string' ||
+    typeof attrs === 'number' ||
+    attrs == null
+  ) {
+    children = attrs ?? [];
+    attrs = {};
+  }
   const e = document.createElement(tag);
   for (const k in attrs) {
-    if (k === "class") e.className = attrs[k];
-    else if (k === "text") e.textContent = attrs[k];
+    if (k === 'class') e.className = attrs[k];
+    else if (k === 'text') e.textContent = attrs[k];
     else e.setAttribute(k, attrs[k]);
   }
   const add = (c) => {
@@ -17,6 +28,7 @@ function el(tag, attrs={}, children=[]) {
   add(children);
   return e;
 }
+
 
 const naturalCompareIds = (a, b) => {
   // Splits by ".", compare numeric prefix then alpha suffix, segment by segment
@@ -293,7 +305,6 @@ function qCard(section, q){
   applyTypeVisibility();
 
   // collapse
-  const expandBtn = right.querySelector('.collapse-btn');
   expandBtn.onclick = () => {
     const open = body.style.display === 'block';
     body.style.display = open ? 'none' : 'block';
