@@ -34,10 +34,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Health
 @app.get("/healthz")
 async def healthz():
     return {"ok": True}
+
 
 # Attach user to request.state on every request
 @app.middleware("http")
@@ -52,14 +54,20 @@ async def inject_user(request: Request, call_next):
     request.state.user = await get_user_by_id(uid) if uid else None
     return await call_next(request)
 
+
 # Startup tasks
 @app.on_event("startup")
 async def _ensure_user_index():
     await users_col.create_index("email", unique=True)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 @app.on_event("startup")
 async def _ensure_intake_index():
     await intake_col.create_index("id", unique=True)
+
 
 # Routers
 app.include_router(pages_router)

@@ -11,6 +11,10 @@ from ..deps import require_uid_cookie
 
 router = APIRouter()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 @router.get("/api/intake/questions")
 async def get_intake_questions(
     _uid: str = Depends(require_uid_cookie),
@@ -23,11 +27,19 @@ async def get_intake_questions(
     questions = [q async for q in cur]
     return {"questions": questions}
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 class IntakeAnswers(BaseModel):
     """Payload for saving intake answers."""
 
     answers: Dict[str, Any]
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 @router.post("/api/intake/answers")
 async def save_intake_answers(
     payload: IntakeAnswers, uid: str = Depends(require_uid_cookie)

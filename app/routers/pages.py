@@ -14,7 +14,14 @@ async def main_page(request: Request):
 
 @router.get("/dashboard", response_class=HTMLResponse)
 async def dashboard_page(request: Request, _u=Depends(require_login_redirect)):
+<<<<<<< HEAD
     return templates.TemplateResponse("dashboard.html",{"request": request, "user": request.state.user},)
+=======
+    return templates.TemplateResponse(
+        "dashboard.html",
+        {"request": request, "user": request.state.user},
+    )
+>>>>>>> main
 
 @router.get("/intake", response_class=HTMLResponse)
 async def intake_page(request: Request, _u=Depends(require_login_redirect)):

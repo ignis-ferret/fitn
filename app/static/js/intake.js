@@ -27,6 +27,7 @@ function renderQuestion() {
   const label = document.createElement('p');
   label.textContent = q.text;
   container.appendChild(label);
+<<<<<<< HEAD
   let input;
   if (q.type === 'single-select' && q.options) {
     input = document.createElement('select');
@@ -42,11 +43,46 @@ function renderQuestion() {
   }
   input.id = 'answer';
   container.appendChild(input);
+=======
+  if ((q.type === 'single-select' || q.type === 'multi-select') && q.options) {
+    const list = document.createElement('div');
+    q.options.forEach((o, i) => {
+      const wrap = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = q.type === 'multi-select' ? 'checkbox' : 'radio';
+      input.name = 'answer';
+      input.value = o.value || o.text;
+      wrap.appendChild(input);
+      wrap.appendChild(document.createTextNode(o.text));
+      list.appendChild(wrap);
+    });
+    container.appendChild(list);
+  } else {
+    const input = document.createElement('input');
+    input.type = q.type === 'number' ? 'number' : 'text';
+    input.id = 'answer';
+    container.appendChild(input);
+  }
+>>>>>>> main
 }
 
 async function next() {
   const q = questions[index];
+<<<<<<< HEAD
   const val = document.getElementById('answer').value;
+=======
+  let val;
+  if (q.type === 'multi-select') {
+    val = Array.from(
+      document.querySelectorAll('input[name="answer"]:checked')
+    ).map((el) => el.value);
+  } else if (q.type === 'single-select') {
+    const selected = document.querySelector('input[name="answer"]:checked');
+    val = selected ? selected.value : null;
+  } else {
+    val = document.getElementById('answer').value;
+  }
+>>>>>>> main
   answers[q.variable_name] = val;
   index += 1;
   if (index < questions.length) {
