@@ -7,48 +7,8 @@
     <section class="hero card">
       <h1>Welcome{{ " " + user.name if user and user.get("name") else "" }} 👋</h1>
       <p>Your plan at a glance.</p>
-
-      <div class="grid">
-        <div class="card">
-          <h2>Sleep</h2>
-          {% if summary.sleep.exists %}
-            <p>Plan active.</p>
-            {% if summary.sleep.updated_at %}<div class="small">Updated: {{ summary.sleep.updated_at }}</div>{% endif %}
-            <div class="row"><a class="btn ghost" href="/intake">Adjust</a></div>
-          {% else %}
-            <p class="small">{{ summary.sleep.notes }}</p>
-            <div class="row"><a class="btn primary" href="/intake">Create plan</a></div>
-          {% endif %}
-        </div>
-
-        <div class="card">
-          <h2>Diet / Meals</h2>
-          {% if summary.diet.exists %}
-            <p>Plan active.</p>
-            {% if summary.diet.updated_at %}<div class="small">Updated: {{ summary.diet.updated_at }}</div>{% endif %}
-            <div class="row"><a class="btn ghost" href="/intake">Adjust</a></div>
-          {% else %}
-            <p class="small">{{ summary.diet.notes }}</p>
-            <div class="row"><a class="btn primary" href="/intake">Create plan</a></div>
-          {% endif %}
-        </div>
-
-        <div class="card">
-          <h2>Rewards</h2>
-          {% if summary.rewards.exists %}
-            <p>
-              Selected:
-              {{ summary.rewards.level1_count }} L1 ·
-              {{ summary.rewards.level2_count }} L2 ·
-              {{ summary.rewards.level3_count }} scenarios
-            </p>
-            {% if summary.rewards.updated_at %}<div class="small">Updated: {{ summary.rewards.updated_at }}</div>{% endif %}
-            <div class="row"><a class="btn ghost" href="/rewards/">Edit</a></div>
-          {% else %}
-            <p class="small">No selections yet.</p>
-            <div class="row"><a class="btn primary" href="/rewards/">Choose rewards</a></div>
-          {% endif %}
-        </div>
+      <div class="row">
+        <a class="btn primary" href="/intake">Create New Plan</a>
       </div>
     </section>
   </div>
