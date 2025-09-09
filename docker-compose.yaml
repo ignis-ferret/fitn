@@ -4,6 +4,9 @@ services:
     env_file: .env
     depends_on:
       - mongo
+    #ports: ["8002:8002"]
+    volumes:
+      - ./app/templates:/srv/app/templates:ro
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8002/healthz"]
       interval: 10s
@@ -12,18 +15,21 @@ services:
     networks: ["internal"]
 
   mongo:
-    image: mongo:7
-    volumes: ["mongo-data:/data/db"]
+    image: mongo:8.0
+    volumes: ["mongo_data:/data/db"]
     networks: ["internal"]
 
   nginx:
-    build: ./nginx
-    ports: ["80:80"]
+    image: nginx:1.25-alpine
     depends_on: ["api"]
+    ports: ["80:80"]
     networks: ["internal", "public"]
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./app/static:/usr/share/nginx/html/static:ro
 
 volumes:
-  mongo-data:
+  mongo_data:
 
 networks:
   internal:
