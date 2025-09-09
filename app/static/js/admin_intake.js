@@ -2,6 +2,7 @@ let raw = {};               // { section: [questions] } as returned
 let filtered = {};          // after search/filter
 let dirtySections = new Set();
 
+/* ---------------- Helpers ---------------- */
 function el(tag, attrs = {}, children = []) {
   // Allow el(tag, [children...]) or el(tag, child) or el(tag, null, children)
   if (
@@ -29,6 +30,14 @@ function el(tag, attrs = {}, children = []) {
   return e;
 }
 
+const on = (id, evt, handler) => {
+  const node = document.getElementById(id);
+  if (!node) {
+    console.warn(`[admin_intake] missing #${id} when binding ${evt}`);
+    return;
+  }
+  node.addEventListener(evt, handler);
+};
 
 const naturalCompareIds = (a, b) => {
   // Splits by ".", compare numeric prefix then alpha suffix, segment by segment
@@ -63,7 +72,7 @@ const computeNextIdForSection = (sectionName) => {
   const list = (raw[sectionName] || []).map(q => q.id).filter(id => id.startsWith(base + "."));
   if (list.length === 0) return base + ".1";
   // find max last numeric segment
-  let maxNum = 0, suffix = "";
+  let maxNum = 0;
   list.forEach(id => {
     const parts = id.split('.');
     let last = parts[parts.length - 1]; // may be "1", "1f", "1m"
@@ -78,6 +87,7 @@ const computeNextIdForSection = (sectionName) => {
 
 const refreshCreateSectionSelect = () => {
   const sel = document.getElementById("c_section");
+  if (!sel) return;
   sel.innerHTML = "";
   Object.keys(raw).sort((a,b)=> naturalCompareIds(a,b)).forEach(sec => {
     const opt = document.createElement("option");
@@ -88,24 +98,29 @@ const refreshCreateSectionSelect = () => {
 };
 
 const updateNextIdHint = () => {
-  const sec = document.getElementById("c_section").value;
+  const secSel = document.getElementById("c_section");
+  const hint = document.getElementById("c_nextid_hint");
+  if (!secSel || !hint) return;
+  const sec = secSel.value;
   const id = computeNextIdForSection(sec);
-  document.getElementById("c_nextid_hint").textContent = id ? `Next ID will be: ${id}` : "Next ID will be computed…";
+  hint.textContent = id ? `Next ID will be: ${id}` : "Next ID will be computed…";
 };
 
+/* ---------------- Data load / filter / render ---------------- */
 async function reload(){
   const res = await fetch('/api/admin/intake');
   if(!res.ok){ alert('Failed to load'); return; }
   const json = await res.json();
   raw = json.sections || {};
   applyFilterAndRender();
-  // setup create form sections
   refreshCreateSectionSelect();
 }
 
 function applyFilterAndRender(){
-  const q = document.getElementById('search').value.trim().toLowerCase();
-  const secFilter = document.getElementById('sectionFilter').value;
+  const qInput = document.getElementById('search');
+  const secSel = document.getElementById('sectionFilter');
+  const q = (qInput?.value || "").trim().toLowerCase();
+  const secFilter = secSel?.value || "";
   filtered = {};
   for(const sec of Object.keys(raw)){
     if(secFilter && sec !== secFilter) continue;
@@ -131,17 +146,21 @@ function showSaveOrder(section, show){
 
 function render(){
   const root = document.getElementById('sections');
+  if (!root) return;
   root.innerHTML = '';
+
   // fill filter dropdown
   const filterSel = document.getElementById('sectionFilter');
-  const existing = new Set(Array.from(filterSel.options).map(o=>o.value));
-  Object.keys(raw).forEach(sec=>{
-    if(!existing.has(sec)){
-      const o = document.createElement('option');
-      o.value = sec; o.textContent = sec;
-      filterSel.appendChild(o);
-    }
-  });
+  if (filterSel) {
+    const existing = new Set(Array.from(filterSel.options).map(o=>o.value));
+    Object.keys(raw).forEach(sec=>{
+      if(!existing.has(sec)){
+        const o = document.createElement('option');
+        o.value = sec; o.textContent = sec;
+        filterSel.appendChild(o);
+      }
+    });
+  }
 
   const secs = Object.keys(filtered).sort((a,b)=> naturalCompareIds(a,b));
   for(const sec of secs){
@@ -207,6 +226,7 @@ function render(){
   }
 }
 
+/* ---------------- Cards ---------------- */
 function qCard(section, q){
   const card = el('div', {class:'qcard', draggable:'true', 'data-id':q.id});
   card.addEventListener('dragstart', e => {
@@ -404,42 +424,133 @@ async function saveOrder(section){
   }
 }
 
-/* ---------- Create flow ---------- */
+/* ---------------- Create flow ---------------- */
 function toggleCreate(){
   const f = document.getElementById('createForm');
+  if (!f) return;
   const on = (f.style.display !== 'block');
   f.style.display = on ? 'block' : 'none';
   if(on){
-    // default type show/hide
+    wireCreateFormOnce();
     applyCreateTypeVisibility();
+    updateNextIdHint();
   }
 }
-function addCOpt(){ document.getElementById('c_opts').appendChild(optRow({id:'', text:'', value:''})); }
+function addCOpt(){
+  const cOpts = document.getElementById('c_opts');
+  if (!cOpts) return;
+  cOpts.appendChild(optRow({id:'', text:'', value:''}));
+}
 
 function applyCreateTypeVisibility(){
-  const t = document.getElementById('c_type').value;
-  document.getElementById('c_opts_wrap').classList.toggle('hidden', !(t==='single-select'||t==='multi-select'));
-  document.getElementById('c_multisel_wrap').classList.toggle('hidden', t!=='multi-select');
-  document.getElementById('c_numwrap').classList.toggle('hidden', t!=='number');
-}
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('c_type').addEventListener('change', applyCreateTypeVisibility);
-  document.getElementById('c_section').addEventListener('change', updateNextIdHint);
+  const t = document.getElementById('c_type')?.value;
+  const optsWrap = document.getElementById('c_opts_wrap');
+  const multiWrap = document.getElementById('c_multisel_wrap');
+  const numWrap = document.getElementById('c_numwrap');
+  if (!optsWrap || !multiWrap || !numWrap) return;
 
-  /* ---------- UI wires ---------- */
-  document.getElementById('reloadBtn').onclick = reload;
-  document.getElementById('toggleCreate').onclick = toggleCreate;
-  document.getElementById('search').addEventListener('input', applyFilterAndRender);
-  document.getElementById('sectionFilter').addEventListener('change', applyFilterAndRender);
-  document.getElementById('expandAll').onclick = () => {
+  optsWrap.classList.toggle('hidden', !(t==='single-select'||t==='multi-select'));
+  multiWrap.classList.toggle('hidden', t!=='multi-select');
+  numWrap.classList.toggle('hidden', t!=='number');
+}
+
+let createFormWired = false;
+function wireCreateFormOnce(){
+  if (createFormWired) return;
+  on('c_type', 'change', applyCreateTypeVisibility);
+  on('c_section', 'change', updateNextIdHint);
+  const addBtn = document.getElementById('c_addOptBtn');
+  if (addBtn) addBtn.onclick = addCOpt;
+  const cancel = document.getElementById('c_cancelBtn');
+  if (cancel) cancel.onclick = toggleCreate;
+  const create = document.getElementById('c_createBtn');
+  if (create) create.onclick = createSubmit;
+  createFormWired = true;
+}
+
+async function createSubmit(){
+  const secSel = document.getElementById('c_section');
+  const typeSel = document.getElementById('c_type');
+  const varInput = document.getElementById('c_var');
+  const text = document.getElementById('c_text');
+  const optionalSel = document.getElementById('c_optional');
+  const cvar = document.getElementById('c_cvar');
+  const cval = document.getElementById('c_cval');
+  const maxSel = document.getElementById('c_maxsel');
+  const rmin = document.getElementById('c_rmin');
+  const rmax = document.getElementById('c_rmax');
+  const idOverride = document.getElementById('c_id');
+
+  if (!secSel || !typeSel || !text) return;
+
+  const section = secSel.value;
+  const nextId = computeNextIdForSection(section) || '';
+  const id = (idOverride?.value?.trim()) || nextId;
+
+  const optsRoot = document.getElementById('c_opts');
+  const options = optsRoot ? [...optsRoot.querySelectorAll('.opt')].map(row=>{
+    const oi=row.querySelector('.oid')?.value?.trim() || "";
+    const ot=row.querySelector('.otext')?.value?.trim() || "";
+    const ov=row.querySelector('.oval')?.value?.trim() || "";
+    const o={id:oi, text:ot}; if(ov) o.value=ov; return o;
+  }).filter(o=>o.id && o.text) : [];
+
+  const payload = {
+    id,
+    section,
+    variable_name: varInput?.value?.trim() || "",
+    text: text.value.trim(),
+    type: typeSel.value,
+    options: options.length ? options : undefined,
+    range: (rmin?.value || rmax?.value) ? {
+      min: rmin.value ? Number(rmin.value) : null,
+      max: rmax.value ? Number(rmax.value) : null
+    } : undefined,
+    optional: (optionalSel?.value === "true") ? true : undefined,
+    conditional_on: (cvar?.value && cval?.value) ? { variable_name:cvar.value, value:cval.value } : undefined,
+    max_selections: (typeSel.value === 'multi-select' && maxSel?.value) ? Number(maxSel.value) : undefined
+  };
+
+  // POST create
+  const res = await fetch('/api/admin/intake', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+
+  if (res.ok) {
+    toggleCreate();
+    reload();
+  } else {
+    const msg = await res.text().catch(()=> 'Create failed');
+    alert(msg || 'Create failed');
+  }
+}
+
+/* ---------------- Boot ---------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  // create form controls (may be hidden initially)
+  // on('c_type', 'change', applyCreateTypeVisibility);
+  // on('c_section', 'change', updateNextIdHint);
+  // const addBtn = document.getElementById('c_addOptBtn');
+  // if (addBtn) addBtn.onclick = addCOpt;
+  // on('c_cancelBtn', 'click', toggleCreate);
+  // on('c_createBtn', 'click', createSubmit);
+
+  // top-level UI
+  on('reloadBtn', 'click', reload);
+  on('toggleCreate', 'click', toggleCreate);
+  on('search', 'input', applyFilterAndRender);
+  on('sectionFilter', 'change', applyFilterAndRender);
+  on('expandAll', 'click', () => {
     document.querySelectorAll('.qbody').forEach(b=>{ b.style.display='block'; });
     document.querySelectorAll('.collapse-btn').forEach(b=> b.textContent='▾');
-  };
-  document.getElementById('collapseAll').onclick = () => {
+  });
+  on('collapseAll', 'click', () => {
     document.querySelectorAll('.qbody').forEach(b=>{ b.style.display='none'; });
     document.querySelectorAll('.collapse-btn').forEach(b=> b.textContent='▸');
-  };
+  });
 
-  /* ---------- Go ---------- */
+  // Go
   reload();
 });

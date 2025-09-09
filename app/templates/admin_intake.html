@@ -20,20 +20,108 @@
       <button class="btn" id="toggleCreate">New Question</button>
     </div>
 
+    <!-- Create Form -->
     <div class="card create-wrap" id="createForm">
-      <!-- (unchanged content column markup) -->
-      <!-- copy from previous admin_intake.html; omitted here for brevity -->
-      <!-- The JS will wire it up exactly as before -->
       <div class="grid">
-        <!-- left meta column -->
-        <!-- right content column -->
+        <!-- Left/meta -->
+        <div>
+          <div class="row">
+            <div>
+              <label for="c_section">Section</label>
+              <select id="c_section"></select>
+              <div id="c_nextid_hint" class="muted" style="margin-top:6px;"></div>
+            </div>
+            <div>
+              <label for="c_type">Type</label>
+              <select id="c_type">
+                <option value="single-select">single-select</option>
+                <option value="multi-select">multi-select</option>
+                <option value="number">number</option>
+                <option value="time">time</option>
+                <option value="time_24h">time_24h</option>
+                <option value="boolean">boolean</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="c_var">variable_name</label>
+              <input id="c_var" type="text" placeholder="e.g., sleep_duration" />
+            </div>
+            <div>
+              <label for="c_optional">optional</label>
+              <select id="c_optional">
+                <option value="">optional: no</option>
+                <option value="true">optional: yes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="c_cvar">conditional var (variable_name)</label>
+              <input id="c_cvar" type="text" placeholder="shown when this variable…" />
+            </div>
+            <div>
+              <label for="c_cval">conditional value</label>
+              <input id="c_cval" type="text" placeholder="…has this value" />
+            </div>
+          </div>
+
+          <div id="c_multisel_wrap" class="hidden" style="margin-top:6px;">
+            <label for="c_maxsel">max_selections (multi-select only)</label>
+            <input id="c_maxsel" type="number" min="1" />
+          </div>
+
+          <div id="c_numwrap" class="hidden" style="margin-top:6px;">
+            <div class="row">
+              <div>
+                <label for="c_rmin">range.min (number type)</label>
+                <input id="c_rmin" type="number" />
+              </div>
+              <div>
+                <label for="c_rmax">range.max (number type)</label>
+                <input id="c_rmax" type="number" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <div>
+              <label for="c_id">ID (optional override)</label>
+              <input id="c_id" type="text" placeholder="leave blank to auto-use Next ID" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn" id="c_createBtn" type="button">Create</button>
+            <button class="btn ghost" id="c_cancelBtn" type="button">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Right/content -->
+        <div>
+          <label for="c_text">text</label>
+          <textarea id="c_text" rows="3" placeholder="Question text…"></textarea>
+
+          <div id="c_opts_wrap" class="hidden" style="margin-top:10px;">
+            <div class="opts-head">
+              <strong>Options</strong>
+              <button class="btn ghost small" type="button" id="c_addOptBtn">Add</button>
+            </div>
+            <div id="c_opts"></div>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Sections/cards render here -->
     <div id="sections"></div>
   </div>
 {% endblock %}
 
 {% block scripts %}
-<script defer src="{{ url_for('static', path='js/admin_intake.js') }}"></script>
+<!-- Add a tiny cache-buster while iterating -->
+<script defer src="{{ url_for('static', path='js/admin_intake.js') }}?v=dev2"></script>
 {% endblock %}
