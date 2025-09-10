@@ -1,14 +1,18 @@
 {% extends "base.html" %} {% block title %}Intake · Fitn{% endblock %} {% block
-content %}
+styles %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/intake.css') }}" />
+{% endblock %} {% block content %}
 <div class="wrap">
   <div class="card" id="wizard">
     <h1>Planner Intake</h1>
+    <div id="progress"><div id="progressBar"></div></div>
     <div id="question"></div>
     <div class="controls">
-      <button id="nextBtn" class="btn" disabled>Next</button>
+      <button id="nextBtn" class="btn disabled">Next</button>
     </div>
   </div>
 </div>
+<div id="toast" class="toast"></div>
 {% endblock %} {% block scripts %}
 <script defer src="{{ url_for('static', path='js/intake.js') }}"></script>
 {% endblock %}

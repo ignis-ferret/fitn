@@ -1,6 +1,7 @@
 # app/routers/intake.py
 """Endpoints for the intake wizard used to create a new plan."""
-from typing import Any, Dict
+import re
+from typing import Any, Dict, List, Tuple
 
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException
@@ -20,9 +21,21 @@ async def get_intake_questions(
 
     The client side wizard uses these questions to render the interview.
     """
-    cur = intake_col.find({}, {"_id": 0}).sort("id", 1)
-    questions = [q async for q in cur]
-    return {"questions": questions}
+    cur = intake_col.find({}, {"_id": 0})
+    items = [q async for q in cur]
+
+    def natural_key(val: str) -> List[Tuple[int, str]]:
+        parts: List[Tuple[int, str]] = []
+        for seg in val.split("."):
+            m = re.match(r"(\d+)([a-z]*)", seg, re.I)
+            if m:
+                parts.append((int(m.group(1)), m.group(2)))
+            else:
+                parts.append((float("inf"), seg))
+        return parts
+
+    items.sort(key=lambda q: natural_key(q["id"]))
+    return {"questions": items}
 
 
 class IntakeAnswers(BaseModel):

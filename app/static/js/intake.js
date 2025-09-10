@@ -7,6 +7,23 @@ let index = 0;
 const answers = {};
 let currentGroup = [];
 let nextBtn;
+let progressBar;
+
+function updateProgress() {
+  if (!progressBar) return;
+  const pct = questions.length ? (index / questions.length) * 100 : 0;
+  progressBar.style.width = pct + "%";
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.style.display = "block";
+  setTimeout(() => {
+    t.style.display = "none";
+  }, 2000);
+}
 
 async function loadQuestions() {
   try {
@@ -14,6 +31,18 @@ async function loadQuestions() {
     if (!res.ok) throw new Error("Failed to load");
     const data = await res.json();
     questions = data.questions || [];
+    const saved = localStorage.getItem("intake_progress");
+    if (saved) {
+      try {
+        const state = JSON.parse(saved);
+        if (state.answers && confirm("Resume where you left off?")) {
+          index = state.index || 0;
+          Object.assign(answers, state.answers);
+        } else {
+          localStorage.removeItem("intake_progress");
+        }
+      } catch {}
+    }
     if (questions.length === 0) {
       document.getElementById("question").textContent =
         "No questions available.";
@@ -71,8 +100,12 @@ function renderQuestion() {
     label.textContent = q.text;
     wrap.appendChild(label);
 
-    if ((q.type === "single-select" || q.type === "multi-select") && q.options) {
+    if (
+      (q.type === "single-select" || q.type === "multi-select") &&
+      q.options
+    ) {
       const list = document.createElement("div");
+      const saved = answers[q.variable_name];
       q.options.forEach((o) => {
         const l = document.createElement("label");
         l.className = "option";
@@ -80,6 +113,10 @@ function renderQuestion() {
         input.type = q.type === "multi-select" ? "checkbox" : "radio";
         input.name = q.variable_name;
         input.value = o.value || o.text;
+        if (saved) {
+          if (Array.isArray(saved)) input.checked = saved.includes(input.value);
+          else input.checked = saved === input.value;
+        }
         l.appendChild(input);
         l.appendChild(document.createTextNode(o.text));
         list.appendChild(l);
@@ -89,11 +126,13 @@ function renderQuestion() {
       const input = document.createElement("input");
       if (q.type === "number") {
         input.type = "range";
-        const min = q.range && typeof q.range.min === "number" ? q.range.min : 0;
-        const max = q.range && typeof q.range.max === "number" ? q.range.max : 100;
+        const min =
+          q.range && typeof q.range.min === "number" ? q.range.min : 0;
+        const max =
+          q.range && typeof q.range.max === "number" ? q.range.max : 100;
         input.min = min;
         input.max = max;
-        input.value = min;
+        input.value = answers[q.variable_name] ?? min;
         const out = document.createElement("span");
         out.className = "slider-value";
         out.textContent = input.value;
@@ -104,6 +143,7 @@ function renderQuestion() {
         wrap.appendChild(out);
       } else {
         input.type = q.type === "time_24h" ? "time" : "text";
+        if (answers[q.variable_name]) input.value = answers[q.variable_name];
         wrap.appendChild(input);
       }
       input.id = q.variable_name;
@@ -114,10 +154,13 @@ function renderQuestion() {
 
   updateVisibility();
   updateNextButton();
+  updateProgress();
 }
 
 function getValue(q) {
-  const wrap = document.querySelector(`.question[data-var="${q.variable_name}"]`);
+  const wrap = document.querySelector(
+    `.question[data-var="${q.variable_name}"]`,
+  );
   if (!wrap) return null;
   if (q.type === "multi-select") {
     return Array.from(wrap.querySelectorAll("input:checked")).map(
@@ -135,7 +178,9 @@ function getValue(q) {
 function updateVisibility() {
   currentGroup.forEach((q) => {
     if (!q.conditional_on) return;
-    const wrap = document.querySelector(`.question[data-var="${q.variable_name}"]`);
+    const wrap = document.querySelector(
+      `.question[data-var="${q.variable_name}"]`,
+    );
     let depVal = answers[q.conditional_on.variable_name];
     if (depVal === undefined) {
       const depQ = currentGroup.find(
@@ -153,10 +198,12 @@ function updateVisibility() {
 
 function updateNextButton() {
   if (!nextBtn) return;
-  nextBtn.disabled = false;
+  let enabled = true;
   for (const q of currentGroup) {
     if (q.optional) continue;
-    const wrap = document.querySelector(`.question[data-var="${q.variable_name}"]`);
+    const wrap = document.querySelector(
+      `.question[data-var="${q.variable_name}"]`,
+    );
     if (q.conditional_on && wrap.style.display === "none") continue;
     const val = getValue(q);
     if (
@@ -164,16 +211,25 @@ function updateNextButton() {
       val === "" ||
       (Array.isArray(val) && val.length === 0)
     ) {
-      nextBtn.disabled = true;
+      enabled = false;
       break;
     }
   }
+  nextBtn.classList.toggle("disabled", !enabled);
 }
 
 async function next() {
+  if (nextBtn.classList.contains("disabled")) {
+    showToast("Please complete the question.");
+    return;
+  }
   currentGroup.forEach((q) => {
     const val = getValue(q);
-    if (val !== null && val !== "" && !(Array.isArray(val) && val.length === 0)) {
+    if (
+      val !== null &&
+      val !== "" &&
+      !(Array.isArray(val) && val.length === 0)
+    ) {
       answers[q.variable_name] = val;
     }
   });
@@ -189,8 +245,10 @@ async function next() {
   }
 
   if (index < questions.length) {
+    localStorage.setItem("intake_progress", JSON.stringify({ index, answers }));
     renderQuestion();
   } else {
+    localStorage.removeItem("intake_progress");
     await fetch("/api/intake/answers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -202,7 +260,8 @@ async function next() {
 
 document.addEventListener("DOMContentLoaded", () => {
   nextBtn = document.getElementById("nextBtn");
+  progressBar = document.getElementById("progressBar");
   nextBtn.addEventListener("click", next);
   loadQuestions();
+  updateProgress();
 });
-
