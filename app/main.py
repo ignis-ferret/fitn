@@ -60,10 +60,7 @@ async def inject_user(request: Request, call_next):
 async def _ensure_user_index():
     await users_col.create_index("email", unique=True)
 
-<<<<<<< HEAD
-=======
 
->>>>>>> main
 @app.on_event("startup")
 async def _ensure_intake_index():
     await intake_col.create_index("id", unique=True)

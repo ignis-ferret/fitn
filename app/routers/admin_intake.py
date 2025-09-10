@@ -1,21 +1,24 @@
 # app/routers/admin_intake.py
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
-from ..template_loader import templates  # ✅ shared env
-from ..deps import require_admin
-from ..db import intake_col
-from ..models import IntakeQuestion
 # app/routers/admin_intake.py (add these imports near the top)
 from pydantic import BaseModel
-from typing import List
 from pymongo import UpdateOne
 
+from ..db import intake_col
+from ..deps import require_admin
+from ..template_loader import templates  # ✅ shared env
+
 router = APIRouter()
+
 
 @router.get("/admin/intake", response_class=HTMLResponse)
 async def admin_intake_page(request: Request, _uid: str = Depends(require_admin)):
     return templates.TemplateResponse("admin_intake.html", {"request": request})
+
 
 @router.get("/api/admin/intake")
 async def list_intake(grouped: int = 1, _uid: str = Depends(require_admin)):
@@ -28,14 +31,17 @@ async def list_intake(grouped: int = 1, _uid: str = Depends(require_admin)):
         out.setdefault(q["section"], []).append(q)
     return {"sections": out}
 
+
 # app/routers/admin_intake.py (append at the bottom of the file)
 class ReorderItem(BaseModel):
     id: str
     sort_index: int
 
+
 class ReorderPayload(BaseModel):
     section: str
     order: List[ReorderItem]
+
 
 @router.post("/api/admin/intake/reorder")
 async def reorder_intake(payload: ReorderPayload, _uid: str = Depends(require_admin)):

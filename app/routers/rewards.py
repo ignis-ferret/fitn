@@ -1,11 +1,14 @@
 # app/routers/rewards.py
 from datetime import datetime, timezone
+
 from fastapi import APIRouter, HTTPException, Request
+
 from ..db import options_col, sel_col
+from ..deps import get_user_by_id, require_uid_cookie
 from ..models import RewardTree, SelectionPayload
-from ..deps import require_uid_cookie, get_user_by_id
 
 router = APIRouter(prefix="/api")
+
 
 @router.get("/options")
 async def get_options():
@@ -14,6 +17,7 @@ async def get_options():
         return {"groups": []}
     doc.pop("_id", None)
     return doc
+
 
 @router.post("/selections")
 async def post_selection(request: Request, payload: SelectionPayload):
