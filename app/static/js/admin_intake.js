@@ -43,8 +43,12 @@ const naturalCompareIds = (a, b) => {
   // Splits by ".", compare numeric prefix then alpha suffix, segment by segment
   const seg = (s) =>
     s.split(".").map((p) => {
-      const m = /^(\d+)([a-z]*)$/i.exec(p) || [null, p, ""];
-      return { n: isNaN(+m[1]) ? null : +m[1], s: isNaN(+m[1]) ? p : m[2] };
+      const token = p.trim().split(/\s+/)[0];
+      const m = /^(\d+)([a-z]*)/i.exec(token) || [];
+      return {
+        n: m[1] ? Number(m[1]) : null,
+        s: m[1] ? m[2] || "" : token,
+      };
     });
   const A = seg(a),
     B = seg(b);
@@ -76,12 +80,12 @@ const computeNextIdForSection = (sectionName) => {
     .map((q) => q.id)
     .filter((id) => id.startsWith(base + "."));
   if (list.length === 0) return base + ".1";
-  // find max last numeric segment
+  // find max numeric segment immediately after base, ignoring trailing letters
   let maxNum = 0;
   list.forEach((id) => {
-    const parts = id.split(".");
-    let last = parts[parts.length - 1]; // may be "1", "1f", "1m"
-    const mm = /^(\d+)/.exec(last);
+    const remainder = id.slice(base.length + 1);
+    const seg = remainder.split(".")[0];
+    const mm = /^(\d+)/.exec(seg);
     if (mm) {
       const n = +mm[1];
       if (n > maxNum) maxNum = n;
@@ -314,6 +318,12 @@ function qCard(section, q) {
   const text = el("textarea", { rows: "3" });
   text.value = q.text || "";
 
+  // editable id
+  const idRow = el("div", { class: "row" });
+  const idInput = el("input", { type: "text", value: q.id, class: "qid" });
+  idRow.appendChild(el("div", [el("label", { text: "id" }), idInput]));
+  body.appendChild(idRow);
+
   // editable meta
   const row1 = el("div", { class: "row" });
   const varInput = el("input", { type: "text", value: q.variable_name || "" });
@@ -441,8 +451,9 @@ function qCard(section, q) {
 
   // save/delete
   save.onclick = async () => {
+    const newId = idInput.value.trim();
     const payload = {
-      id: q.id,
+      id: newId,
       section: q.section,
       variable_name: varInput.value.trim(),
       text: text.value.trim(),

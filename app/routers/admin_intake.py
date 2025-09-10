@@ -1,5 +1,5 @@
 # app/routers/admin_intake.py
-from typing import List
+from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
@@ -33,6 +33,52 @@ async def list_intake(grouped: int = 1, _uid: str = Depends(require_admin)):
 
 
 # app/routers/admin_intake.py (append at the bottom of the file)
+class IntakeQuestion(BaseModel):
+    id: str
+    section: str
+    text: str
+    type: str
+    variable_name: str
+    options: Optional[List[Dict[str, Any]]] = None
+    range: Optional[Dict[str, Any]] = None
+    optional: Optional[bool] = None
+    conditional_on: Optional[Dict[str, Any]] = None
+    max_selections: Optional[int] = None
+    sort_index: Optional[int] = None
+
+
+@router.post("/api/admin/intake")
+async def create_question(
+    q: IntakeQuestion, _uid: str = Depends(require_admin)
+) -> Dict[str, Any]:
+    if await intake_col.find_one({"id": q.id}):
+        raise HTTPException(status_code=400, detail="id exists")
+    await intake_col.insert_one(q.dict(exclude_none=True))
+    return {"ok": True}
+
+
+@router.put("/api/admin/intake/{qid}")
+async def update_question(
+    qid: str, q: IntakeQuestion, _uid: str = Depends(require_admin)
+) -> Dict[str, Any]:
+    if q.id != qid and await intake_col.find_one({"id": q.id}):
+        raise HTTPException(status_code=400, detail="id exists")
+    res = await intake_col.update_one({"id": qid}, {"$set": q.dict(exclude_none=True)})
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="not found")
+    return {"ok": True}
+
+
+@router.delete("/api/admin/intake/{qid}")
+async def delete_question(
+    qid: str, _uid: str = Depends(require_admin)
+) -> Dict[str, Any]:
+    res = await intake_col.delete_one({"id": qid})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="not found")
+    return {"ok": True}
+
+
 class ReorderItem(BaseModel):
     id: str
     sort_index: int
