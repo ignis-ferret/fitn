@@ -120,6 +120,19 @@ h2 {
   color: var(--muted);
 }
 
+/* Form options */
+.option {
+  display: block;
+  margin: 6px 0;
+}
+.option input {
+  margin-right: 8px;
+}
+
+.slider-value {
+  margin-left: 8px;
+}
+
 /* Footer */
 .site-footer {
   margin-top: 40px;

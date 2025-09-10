@@ -37,11 +37,31 @@ async def save_intake_answers(
 ) -> Dict[str, Any]:
     """Store the provided answers on the user document.
 
-    If the user document does not yet exist, raise an error.
+    If the user document does not yet exist, raise an error. If body fat
+    percentage was not provided, estimate it using the Deurenberg formula.
     """
+
+    def estimate_body_fat(ans: Dict[str, Any]) -> float | None:
+        try:
+            weight = float(ans.get("current_weight_lbs"))
+            height = float(ans.get("height_inches"))
+            age = float(ans.get("age"))
+            gender = (ans.get("gender") or "").lower()
+            bmi = (weight / (height * height)) * 703
+            sex = 1 if gender == "male" else 0
+            return round(1.20 * bmi + 0.23 * age - 10.8 * sex - 5.4, 2)
+        except (TypeError, ValueError, ZeroDivisionError):
+            return None
+
+    answers = dict(payload.answers)
+    if not answers.get("body_fat_percentage"):
+        est = estimate_body_fat(answers)
+        if est is not None:
+            answers["body_fat_percentage"] = est
+
     oid = ObjectId(uid)
     res = await users_col.update_one(
-        {"_id": oid}, {"$set": {"intake_answers": payload.answers}}, upsert=False
+        {"_id": oid}, {"$set": {"intake_answers": answers}}, upsert=False
     )
     if res.matched_count == 0:
         raise HTTPException(status_code=404, detail="user not found")

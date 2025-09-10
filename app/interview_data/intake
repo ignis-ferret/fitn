@@ -33,10 +33,21 @@ identity_questions = {
     },
     {
       "id": "1.1.5",
+      "variable_name": "know_body_fat",
+      "text": "Do you know your body fat percentage?",
+      "type": "single-select",
+      "options": [
+        {"id": "1.1.5.1", "text": "yes"},
+        {"id": "1.1.5.2", "text": "no"}
+      ]
+    },
+    {
+      "id": "1.1.5a",
       "variable_name": "body_fat_percentage",
-      "text": "What’s your approximate body fat percentage? (optional)",
+      "text": "What is your body fat percentage?",
       "type": "number",
-      "optional": True
+      "range": {"min": 1, "max": 75},
+      "conditional_on": {"variable_name": "know_body_fat", "value": "yes"}
     },
     {
       "id": "1.1.6",
@@ -1015,8 +1026,9 @@ interests_lifestyle_questions = {
     {
       "id": "1.10.6",
       "variable_name": "desired_unscheduled_downtime_hours_per_day",
-      "text": "How much unscheduled downtime would you like each day? (0–5)",
-      "type": "number"
+      "text": "How much unscheduled downtime would you like each day? (0–5 hours)",
+      "type": "number",
+      "range": {"min": 0, "max": 5}
     }
   ]
 }
