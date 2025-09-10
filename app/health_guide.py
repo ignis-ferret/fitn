@@ -1262,8 +1262,9 @@ interests_lifestyle_questions = {
         {
             "id": "1.10.6",
             "variable_name": "desired_unscheduled_downtime_hours_per_day",
-            "text": "How much unscheduled downtime would you like each day? (0–5)",
+            "text": "How much unscheduled downtime would you like each day? (0–5 hours)",
             "type": "number",
+            "range": {"min": 0, "max": 5},
         },
     ],
 }
