@@ -1,17 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head><title>Dev Prompt</title></head>
-<body>
-  <h1>Prompt ChatGPT</h1>
-  <form method="post">
-    <input type="text" name="prompt" placeholder="Enter your prompt" style="width: 300px" required>
-    <button type="submit">Submit</button>
-  </form>
-  {% if prompt %}
+  <head>
+    <title>Dev Prompt</title>
+  </head>
+  <body>
+    <h1>Prompt ChatGPT</h1>
+    <form method="post">
+      <input
+        type="text"
+        name="prompt"
+        placeholder="Enter your prompt"
+        style="width: 300px"
+        required
+      />
+      <button type="submit">Submit</button>
+    </form>
+    {% if prompt %}
     <h2>Prompt:</h2>
     <pre>{{ prompt }}</pre>
     <h2>Response:</h2>
     <pre>{{ response }}</pre>
-  {% endif %}
-</body>
+    {% endif %}
+  </body>
 </html>
