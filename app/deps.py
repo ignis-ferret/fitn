@@ -1,8 +1,10 @@
 # app/deps.py
-from fastapi import Request, HTTPException, status
 from bson import ObjectId
+from fastapi import HTTPException, Request, status
+
 from .db import users_col
 from .security import parse_session_cookie
+
 
 async def get_user_by_id(uid: str):
     try:
@@ -11,6 +13,7 @@ async def get_user_by_id(uid: str):
         return None
     return await users_col.find_one({"_id": oid})
 
+
 def require_uid_cookie(request: Request) -> str:
     # Backward-compatible: try signed "sid", then fallback to plain "uid"
     sid = request.cookies.get("sid")
@@ -18,6 +21,7 @@ def require_uid_cookie(request: Request) -> str:
     if not uid:
         raise HTTPException(403, "Auth required")
     return uid
+
 
 async def require_admin(request: Request) -> str:
     uid = require_uid_cookie(request)
@@ -28,6 +32,7 @@ async def require_admin(request: Request) -> str:
     # if not user.get("is_admin"):
     #     raise HTTPException(403, "Admin required")
     return uid
+
 
 def require_login_redirect(request: Request):
     if not getattr(request.state, "user", None):

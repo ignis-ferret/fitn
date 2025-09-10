@@ -3,14 +3,16 @@
 # Usage:
 #   MONGODB_URI="mongodb://mongo:27017" DB_NAME="fitn" INTAKE_FILE="interview_data/intake" PURGE=1 python ingest_intake.py
 
-import os
 import asyncio
+import os
+
 import motor.motor_asyncio
 
-MONGO_URI   = os.getenv("MONGODB_URI", "mongodb://mongo:27017")
-DB_NAME     = os.getenv("DB_NAME", "fitn")
+MONGO_URI = os.getenv("MONGODB_URI", "mongodb://mongo:27017")
+DB_NAME = os.getenv("DB_NAME", "fitn")
 INTAKE_FILE = os.getenv("INTAKE_FILE", "interview_data/intake")  # no extension is fine
-PURGE       = os.getenv("PURGE", "0") == "1"
+PURGE = os.getenv("PURGE", "0") == "1"
+
 
 def _load_namespace_from_file(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as f:
@@ -18,6 +20,7 @@ def _load_namespace_from_file(path: str) -> dict:
     ns: dict = {}
     exec(compile(code, path, "exec"), {}, ns)
     return ns
+
 
 def _iter_questions(ns: dict) -> list[dict]:
     # Prefer canonical map
@@ -43,8 +46,9 @@ def _iter_questions(ns: dict) -> list[dict]:
             out.append(doc)
     return out
 
+
 async def main():
-    ns   = _load_namespace_from_file(INTAKE_FILE)
+    ns = _load_namespace_from_file(INTAKE_FILE)
     docs = _iter_questions(ns)
     if not docs:
         raise SystemExit("No questions parsed.")
@@ -65,6 +69,7 @@ async def main():
         elif res.upserted_id:
             ins += 1
     print(f"Done. inserted={ins} updated={upd} total={len(docs)}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
